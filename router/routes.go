@@ -8,7 +8,9 @@ import (
 func initRoutes(router *gin.Engine) {
 	v1 := router.Group("/api/v1")
 	{
+		// fetch a single title (directly search)
 		v1.GET("/title/:title", handler.GetTitle)
+		// fetch a list of a title search
 		v1.GET("/search/:title", handler.GetSearch)
 	}
 }

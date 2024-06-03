@@ -9,6 +9,7 @@ import (
 	"github.com/shh4und/movie-tracker/structs"
 )
 
+// handler for fetching a list of a title search
 func GetTitle(ctx *gin.Context) {
 	titleName := ctx.Param("title")
 	apiKey := os.Getenv("API_KEY")
