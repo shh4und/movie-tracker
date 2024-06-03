@@ -3,7 +3,7 @@ package config
 import (
 	"os"
 
-	"github.com/shh4und/movie-tracker/structs"
+	schemas "github.com/shh4und/movie-tracker/schemas"
 	"gorm.io/driver/sqlite" // Sqlite driver based on CGO
 
 	// "github.com/glebarez/sqlite" // Pure go SQLite driver, checkout https://github.com/glebarez/sqlite for details
@@ -39,7 +39,7 @@ func InitSQLite() (*gorm.DB, error) {
 	}
 
 	// Migrate the struct (schemas)
-	err = db.AutoMigrate(&structs.Title{}, &structs.Rating{}, &structs.Search{})
+	err = db.AutoMigrate(&schemas.Title{})
 	if err != nil {
 		logger.Errorf("auto migrate error: %v", err)
 		return nil, err

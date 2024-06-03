@@ -1,11 +1,6 @@
 package structs
 
-import (
-	"gorm.io/gorm"
-)
-
 type Title struct {
-	gorm.Model
 	Title      string   `json:"Title"`
 	Year       string   `json:"Year"`
 	Rated      string   `json:"Rated"`
@@ -31,13 +26,11 @@ type Title struct {
 }
 
 type Rating struct {
-	gorm.Model
 	Source string `json:"Source"`
 	Value  string `json:"Value"`
 }
 
 type Search struct {
-	gorm.Model
 	Titles       []Title `json:"Search"`
 	TotalResults string  `json:"totalResults"`
 	Response     string  `json:"Response"`

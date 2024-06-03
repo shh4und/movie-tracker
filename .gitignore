@@ -1,2 +1,7 @@
 example
 .env
+*.out
+
+Db folder
+
+db/
