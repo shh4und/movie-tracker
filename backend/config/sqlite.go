@@ -39,7 +39,7 @@ func InitSQLite() (*gorm.DB, error) {
 	}
 
 	// Migrate the struct (schemas)
-	err = db.AutoMigrate(&schemas.Title{})
+	err = db.AutoMigrate(&schemas.Title{}, &schemas.Rating{}, &schemas.User{}, &schemas.UserFavorite{}, &schemas.UserRating{}, &schemas.WatchLater{}, &schemas.WatchedMovie{})
 	if err != nil {
 		logger.Errorf("auto migrate error: %v", err)
 		return nil, err
