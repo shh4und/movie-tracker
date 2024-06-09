@@ -6,7 +6,7 @@ import (
 )
 
 func initRoutes(router *gin.Engine) {
-	titles := router.Group("/titles")
+	titles := router.Group("/api/titles")
 	{
 		// fetch a single title (directly search)
 		titles.GET("/title/:titleName", handler.GetTitle)
@@ -14,7 +14,7 @@ func initRoutes(router *gin.Engine) {
 		titles.GET("/search/:titleName", handler.GetSearch)
 	}
 
-	users := router.Group("/users")
+	users := router.Group("/api/users")
 	{
 
 		// CRUD user routes
@@ -26,11 +26,11 @@ func initRoutes(router *gin.Engine) {
 
 	}
 
-	comments := router.Group("/comments")
+	comments := router.Group("/api/comments")
 	{
 		// comments routes
 		comments.POST("/:userID/:titleID")
-		comments.DELETE("/:commentID")
+		comments.DELETE("/:userID/:commentID")
 		comments.GET("/:titleID")
 		comments.GET("/:userID")
 	}
