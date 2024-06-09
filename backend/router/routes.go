@@ -6,11 +6,33 @@ import (
 )
 
 func initRoutes(router *gin.Engine) {
-	v1 := router.Group("/api/v1")
+	titles := router.Group("/titles")
 	{
 		// fetch a single title (directly search)
-		v1.GET("/title/:title", handler.GetTitle)
+		titles.GET("/title/:titleName", handler.GetTitle)
 		// fetch a list of a title search
-		v1.GET("/search/:title", handler.GetSearch)
+		titles.GET("/search/:titleName", handler.GetSearch)
 	}
+
+	users := router.Group("/users")
+	{
+
+		// CRUD user routes
+		users.POST("/register")
+		users.POST("/login")
+		users.GET("/profile/:userID")
+		users.PUT("/profile/:userID")
+		users.DELETE("/profile/:userID")
+
+	}
+
+	comments := router.Group("/comments")
+	{
+		// comments routes
+		comments.POST("/:userID/:titleID")
+		comments.DELETE("/:commentID")
+		comments.GET("/:titleID")
+		comments.GET("/:userID")
+	}
+
 }

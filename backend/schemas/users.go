@@ -52,3 +52,24 @@ type WatchedMovie struct {
 	CreatedAt time.Time `gorm:"autoCreateTime"`
 	User      User      `gorm:"constraint:OnDelete:CASCADE;"`
 }
+
+type UserProfile struct {
+	ID        uint   `gorm:"primaryKey"`
+	UserID    uint   `gorm:"unique;not null"`
+	FirstName string `gorm:"size:50"`
+	LastName  string `gorm:"size:50"`
+	PhotoURL  string `gorm:"size:255"`
+	Status    string `gorm:"size:255"`
+	User      User   `gorm:"foreignKey:UserID;constraint:OnDelete:CASCADE"`
+}
+
+type Comment struct {
+	ID        uint      `gorm:"primaryKey"`
+	UserID    uint      `gorm:"not null"`
+	MovieID   uint      `gorm:"not null"`
+	Text      string    `gorm:"not null"`
+	CreatedAt time.Time `gorm:"autoCreateTime"`
+	UpdatedAt time.Time `gorm:"autoUpdateTime"`
+	User      User      `gorm:"foreignKey:UserID;constraint:OnDelete:CASCADE"`
+	Title     Title     `gorm:"foreignKey:MovieID;constraint:OnDelete:CASCADE"`
+}
