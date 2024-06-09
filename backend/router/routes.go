@@ -31,8 +31,8 @@ func initRoutes(router *gin.Engine) {
 		// comments routes
 		comments.POST("/:userID/:titleID")
 		comments.DELETE("/:userID/:commentID")
-		comments.GET("/:titleID")
-		comments.GET("/:userID")
+		comments.GET("/title/:titleID")
+		comments.GET("/user/:userID")
 	}
 
 }
