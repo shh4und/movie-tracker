@@ -6,6 +6,9 @@ import (
 )
 
 func initRoutes(router *gin.Engine) {
+
+	handler.InitHandler()
+
 	titles := router.Group("/api/titles")
 	{
 		// fetch a single title (directly search)
@@ -18,8 +21,8 @@ func initRoutes(router *gin.Engine) {
 	{
 
 		// CRUD user routes
-		users.POST("/register")
-		users.POST("/login")
+		users.POST("/register", handler.CreateUser) // create
+		users.POST("/login")                        // authenticate
 		users.GET("/profile/:userID")
 		users.PUT("/profile/:userID")
 		users.DELETE("/profile/:userID")

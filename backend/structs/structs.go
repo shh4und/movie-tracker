@@ -1,5 +1,7 @@
 package structs
 
+import "time"
+
 type Title struct {
 	Title      string   `json:"Title"`
 	Year       string   `json:"Year"`
@@ -34,4 +36,53 @@ type Search struct {
 	Titles       []Title `json:"Search"`
 	TotalResults string  `json:"totalResults"`
 	Response     string  `json:"Response"`
+}
+
+// User represents the users table
+type User struct {
+	UserID   uint   `json:"userid"`
+	Username string `json:"username"`
+	Email    string `json:"email"`
+	Password string `json:"password"`
+	Minor    bool   `json:"minor"`
+}
+
+// UserRating represents the user_ratings table
+type UserRating struct {
+	UserID  uint `json:"userid"`
+	MovieID uint `json:"movieid"`
+	Rating  int  `json:"rate"`
+}
+
+// UserFavorite represents the user_favorites table
+type UserFavorite struct {
+	UserID  uint `json:"userid"`
+	MovieID uint `json:"movieid"`
+}
+
+// WatchLater represents the watch_later table
+type WatchLater struct {
+	UserID  uint `json:"userid"`
+	MovieID uint `json:"movieid"`
+}
+
+// WatchedMovie represents the watched_movies table
+type WatchedMovie struct {
+	UserID    uint      `json:"userid"`
+	MovieID   uint      `json:"movieid"`
+	WatchedOn time.Time `json:"watchedon"`
+}
+
+type UserProfile struct {
+	UserID    uint   `json:"userid"`
+	FirstName string `json:"fname"`
+	LastName  string `json:"lname"`
+	PhotoURL  string `json:"photourl"`
+	Status    string `json:"status"`
+}
+
+type Comment struct {
+	UserID  uint   `json:"userid"`
+	MovieID uint   `json:"movieid"`
+	Text    string `json:"comment"`
 }

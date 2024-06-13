@@ -8,7 +8,7 @@ type User struct {
 	Username  string    `gorm:"size:50;unique;not null"`
 	Email     string    `gorm:"size:100;unique;not null"`
 	Password  string    `gorm:"size:100;not null"`
-	Birthdate time.Time `gorm:"not null"`
+	Minor     bool      `gorm:"not null"`
 	CreatedAt time.Time `gorm:"autoCreateTime"`
 	UpdatedAt time.Time `gorm:"autoUpdateTime"`
 }
