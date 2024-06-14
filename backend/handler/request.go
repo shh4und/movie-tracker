@@ -5,7 +5,7 @@ import (
 )
 
 func errParamIsRequired(name, tp string) error {
-	return fmt.Errorf("param: %s | type: %s is required", name, tp)
+	return fmt.Errorf("( param: %s | type: %s )is required", name, tp)
 }
 
 // Create User
@@ -31,6 +31,10 @@ func (r *CreateUserRequest) Validate() error {
 
 	if r.Password == "" {
 		return errParamIsRequired("password", "string")
+	}
+
+	if len(r.Password) < 8 {
+		return fmt.Errorf("the password must have at least 8 characters")
 	}
 
 	if r.Minor {
