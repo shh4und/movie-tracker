@@ -5,7 +5,7 @@ import (
 )
 
 func errParamIsRequired(name, tp string) error {
-	return fmt.Errorf("( param: %s | type: %s )is required", name, tp)
+	return fmt.Errorf("( param: %s | type: %s ) is required", name, tp)
 }
 
 // Create User

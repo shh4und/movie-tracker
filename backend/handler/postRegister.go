@@ -13,6 +13,7 @@ func CreateUser(ctx *gin.Context) {
 
 	if err := request.Validate(); err != nil {
 		logger.Errorf("request validation error: %v", err)
+		sendError(ctx, http.StatusBadRequest, err.Error())
 		return
 	}
 
@@ -25,9 +26,10 @@ func CreateUser(ctx *gin.Context) {
 
 	if err := db.Create(&newUser).Error; err != nil {
 		logger.Errorf("error creating user: %v", err.Error())
+		sendError(ctx, http.StatusInternalServerError, "error on database -> ")
 		return
 	}
 
-	ctx.JSON(http.StatusOK, newUser)
+	sendSuccess(ctx, "create-user", newUser)
 
 }
