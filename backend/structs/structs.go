@@ -40,11 +40,14 @@ type Search struct {
 
 // User represents the users table
 type User struct {
-	UserID   uint   `json:"userid"`
-	Username string `json:"username"`
-	Email    string `json:"email"`
-	Password string `json:"password"`
-	Minor    bool   `json:"minor"`
+	Username  string `json:"username"`
+	Email     string `json:"email"`
+	Password  string `json:"password"`
+	Minor     bool   `json:"minor"`
+	FirstName string `json:"fname"`
+	LastName  string `json:"lname"`
+	PhotoURL  string `json:"photourl"`
+	Status    string `json:"status"`
 }
 
 // UserRating represents the user_ratings table
@@ -71,14 +74,6 @@ type WatchedMovie struct {
 	UserID    uint      `json:"userid"`
 	MovieID   uint      `json:"movieid"`
 	WatchedOn time.Time `json:"watchedon"`
-}
-
-type UserProfile struct {
-	UserID    uint   `json:"userid"`
-	FirstName string `json:"fname"`
-	LastName  string `json:"lname"`
-	PhotoURL  string `json:"photourl"`
-	Status    string `json:"status"`
 }
 
 type Comment struct {

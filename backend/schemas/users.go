@@ -9,6 +9,10 @@ type User struct {
 	Email     string    `gorm:"size:100;unique;not null"`
 	Password  string    `gorm:"size:100;not null"`
 	Minor     bool      `gorm:"not null"`
+	FirstName string    `gorm:"size:50"`
+	LastName  string    `gorm:"size:50"`
+	PhotoURL  string    `gorm:"size:255"`
+	Status    string    `gorm:"size:255"`
 	CreatedAt time.Time `gorm:"autoCreateTime"`
 	UpdatedAt time.Time `gorm:"autoUpdateTime"`
 }
@@ -50,16 +54,6 @@ type WatchedMovie struct {
 	WatchedOn time.Time
 	CreatedAt time.Time `gorm:"autoCreateTime"`
 	User      User      `gorm:"constraint:OnDelete:CASCADE;"`
-}
-
-type UserProfile struct {
-	ID        uint   `gorm:"primaryKey"`
-	UserID    uint   `gorm:"unique;not null"`
-	FirstName string `gorm:"size:50"`
-	LastName  string `gorm:"size:50"`
-	PhotoURL  string `gorm:"size:255"`
-	Status    string `gorm:"size:255"`
-	User      User   `gorm:"foreignKey:UserID;constraint:OnDelete:CASCADE"`
 }
 
 type Comment struct {

@@ -9,8 +9,10 @@ import (
 
 func CreateUser(ctx *gin.Context) {
 	request := CreateUserRequest{}
-	if err := ctx.BindJSON(&request); err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+	ctx.BindJSON(&request)
+
+	if err := request.Validate(); err != nil {
+		logger.Errorf("request validation error: %v", err)
 		return
 	}
 
