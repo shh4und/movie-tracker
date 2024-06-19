@@ -35,7 +35,7 @@ func UpdateUser(ctx *gin.Context) {
 	}
 
 	if err := db.First(&user, id).Error; err != nil {
-		sendError(ctx, http.StatusNotFound, fmt.Sprintf("user with id:%s not found on the database", id))
+		sendError(ctx, http.StatusNotFound, fmt.Sprintf("user with id: %s not found on the database", id))
 		return
 	}
 	if err := db.Model(&user).Updates(&updateFields).Error; err != nil {
