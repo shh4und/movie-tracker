@@ -23,7 +23,8 @@ func initRoutes(router *gin.Engine) {
 		// CRUD user routes
 		users.POST("/register", handler.CreateUser) // create
 		users.POST("/login")                        // authenticate
-		users.GET("/profile")
+		users.GET("/profile/id", handler.GetUserProfileByID)
+		users.GET("/profile/username", handler.GetUserProfileByUsername)
 		users.PUT("/profile", handler.UpdateUser)
 		users.DELETE("/profile", handler.DeleteUser)
 
