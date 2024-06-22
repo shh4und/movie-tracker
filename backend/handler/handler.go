@@ -8,9 +8,11 @@ import (
 var (
 	logger *config.Logger
 	db     *gorm.DB
+	apiKEY string
 )
 
 func InitHandler() {
 	logger = config.GetLogger("handler")
 	db = config.GetSQLite()
+	apiKEY = config.GetApiKEY()
 }

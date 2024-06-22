@@ -2,6 +2,7 @@ package config
 
 import (
 	"fmt"
+	"os"
 
 	"github.com/joho/godotenv"
 	"gorm.io/gorm"
@@ -10,6 +11,7 @@ import (
 var (
 	db     *gorm.DB
 	logger *Logger
+	apiKey string
 )
 
 func Init() error {
@@ -21,6 +23,8 @@ func Init() error {
 		return fmt.Errorf("Error loading .env file: %v", err)
 	}
 
+	apiKey = os.Getenv("API_KEY")
+
 	db, err = InitSQLite()
 	if err != nil {
 		return fmt.Errorf("Error at initialize sqlite: %v", err)
@@ -30,6 +34,8 @@ func Init() error {
 }
 
 func GetSQLite() *gorm.DB { return db }
+
+func GetApiKEY() string { return apiKey }
 
 func GetLogger(p string) *Logger {
 	logger = NewLogger(p)
