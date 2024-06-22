@@ -11,10 +11,8 @@ func initRoutes(router *gin.Engine) {
 
 	titles := router.Group("/api/search")
 	{
-		// fetch a single title (directly search)
-		titles.GET("/title/:title", handler.GetTitle)
 		// fetch a list of a title search
-		titles.GET("/:title", handler.GetSearch)
+		titles.GET("", handler.GetSearch)
 	}
 
 	users := router.Group("/api/users")
