@@ -2,44 +2,50 @@ package handler
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
-	"os"
 
 	"github.com/gin-gonic/gin"
-	"github.com/shh4und/movie-tracker/structs"
 )
 
 // handler for fetching a list of a title search
 func GetSearch(ctx *gin.Context) {
-	titleName := ctx.Param("title")
-	apiKey := os.Getenv("API_KEY")
+	title := ctx.Query("title")
+	apiKey := apiKEY
 	if apiKey == "" {
-		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "API_KEY not set"})
+		sendError(ctx, http.StatusInternalServerError, fmt.Errorf("apiKEY not set").Error())
 		return
 	}
-	omdbAPIBaseURL := "http://www.omdbapi.com/" + "?apikey=" + apiKey + "&s=" + titleName
+
+	if title == "" {
+		sendError(ctx, http.StatusBadRequest, errParamIsRequired("title", "query-param").Error())
+		return
+	}
+	omdbAPIBaseURL := fmt.Sprintf("http://www.omdbapi.com/?apikey=%s&s=%s", apiKey, title) //move to config file later
 	resp, err := http.Get(omdbAPIBaseURL)
 	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		sendError(ctx, http.StatusBadRequest, err.Error())
 		return
 	}
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
-		ctx.JSON(resp.StatusCode, gin.H{"error": resp.Status})
+		sendError(ctx, resp.StatusCode, resp.Status)
 		return
 	}
 
-	var titles structs.Search
-	if err := json.NewDecoder(resp.Body).Decode(&titles); err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+	request := SearchRequest{}
+
+	if err := json.NewDecoder(resp.Body).Decode(&request); err != nil {
+		sendError(ctx, http.StatusInternalServerError, err.Error())
 		return
 	}
 
-	if titles.Response == "False" {
-		ctx.JSON(http.StatusNotFound, gin.H{"error": "Movie not found"})
+	if err = request.Validate(); err != nil {
+		logger.Errorf("request validation error: %v", err)
+		sendError(ctx, http.StatusNotFound, err.Error())
 		return
 	}
 
-	ctx.JSON(http.StatusOK, titles)
+	sendSuccess(ctx, "search-titles", request)
 }

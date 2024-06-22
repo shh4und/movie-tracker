@@ -62,3 +62,46 @@ func (r *UpdateUserRequest) Validate() error {
 
 	return fmt.Errorf("at least one valid field must be provided")
 }
+
+type TitleRequest struct {
+	Title      string   `json:"Title"`
+	Year       string   `json:"Year"`
+	Rated      string   `json:"Rated"`
+	Released   string   `json:"Released"`
+	Runtime    string   `json:"Runtime"`
+	Genre      string   `json:"Genre"`
+	Director   string   `json:"Director"`
+	Writer     string   `json:"Writer"`
+	Actors     string   `json:"Actors"`
+	Plot       string   `json:"Plot"`
+	Language   string   `json:"Language"`
+	Country    string   `json:"Country"`
+	Awards     string   `json:"Awards"`
+	Poster     string   `json:"Poster"`
+	Ratings    []Rating `json:"Ratings"`
+	Metascore  string   `json:"Metascore"`
+	Type       string   `json:"Type"`
+	DVD        string   `json:"DVD"`
+	BoxOffice  string   `json:"BoxOffice"`
+	Production string   `json:"Production"`
+	Website    string   `json:"Website"`
+	Response   string   `json:"Response"`
+}
+
+type Rating struct {
+	Source string `json:"Source"`
+	Value  string `json:"Value"`
+}
+
+type SearchRequest struct {
+	Titles       []TitleRequest `json:"Search"`
+	TotalResults string         `json:"totalResults"`
+	Response     string         `json:"Response"`
+}
+
+func (r *SearchRequest) Validate() error {
+	if r.Response == "False" {
+		return fmt.Errorf("movie not found")
+	}
+	return nil
+}
