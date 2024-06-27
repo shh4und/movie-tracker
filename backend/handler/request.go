@@ -105,3 +105,25 @@ func (r *SearchRequest) Validate() error {
 	}
 	return nil
 }
+
+// Create User
+type LoginUserRequest struct {
+	Username string `json:"username"`
+	Password string `json:"password"`
+}
+
+func (r *LoginUserRequest) Validate() error {
+	if r.Username == "" && r.Password == "" {
+		return fmt.Errorf("request body is empty or malformed")
+	}
+
+	if r.Username == "" {
+		return errParamIsRequired("email", "string")
+	}
+
+	if r.Password == "" {
+		return errParamIsRequired("password", "string")
+	}
+
+	return nil
+}
