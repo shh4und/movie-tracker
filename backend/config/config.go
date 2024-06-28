@@ -3,6 +3,7 @@ package config
 import (
 	"fmt"
 	"os"
+	"strconv"
 
 	"github.com/joho/godotenv"
 	"gorm.io/gorm"
@@ -11,8 +12,15 @@ import (
 var (
 	db     *gorm.DB
 	logger *Logger
-	apiKey string
 )
+
+type ENVvars struct {
+	ApiKey               string
+	JwtToken             string
+	JwtExpirationSeconds int64
+}
+
+var Envs = GetEnvs()
 
 func Init() error {
 	var err error
@@ -22,8 +30,6 @@ func Init() error {
 	if err != nil {
 		return fmt.Errorf("Error loading .env file: %v", err)
 	}
-
-	apiKey = os.Getenv("API_KEY")
 
 	db, err = InitSQLite()
 	if err != nil {
@@ -35,7 +41,17 @@ func Init() error {
 
 func GetSQLite() *gorm.DB { return db }
 
-func GetApiKEY() string { return apiKey }
+func GetEnvs() ENVvars {
+	exp, err := strconv.ParseInt(os.Getenv("JWT_EXP"), 10, 64)
+	if err != nil {
+		return ENVvars{}
+	}
+	return ENVvars{
+		ApiKey:               os.Getenv("API_KEY"),
+		JwtToken:             os.Getenv("JWT_TK"),
+		JwtExpirationSeconds: exp,
+	}
+}
 
 func GetLogger(p string) *Logger {
 	logger = NewLogger(p)
