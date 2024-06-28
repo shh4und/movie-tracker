@@ -3,6 +3,7 @@ package handler
 import (
 	"net/http"
 
+	"github.com/shh4und/movie-tracker/config"
 	"github.com/shh4und/movie-tracker/handler/auth"
 
 	"github.com/gin-gonic/gin"
@@ -31,6 +32,13 @@ func LoginUser(ctx *gin.Context) {
 		return
 	}
 
-	sendSuccess(ctx, "login-user", user.Username)
+	secret := []byte(config.Envs.JwtToken)
+	token, err := auth.CreateJWT(secret, user.ID)
+	if err != nil {
+		sendError(ctx, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	sendSuccess(ctx, "login-user", token)
 
 }
