@@ -14,5 +14,6 @@ var (
 func InitHandler() {
 	logger = config.GetLogger("handler")
 	db = config.GetSQLite()
-	apiKEY = config.GetApiKEY()
+	apiKEY = config.Envs.ApiKey
+
 }
