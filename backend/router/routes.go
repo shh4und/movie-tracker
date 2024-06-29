@@ -9,13 +9,13 @@ func initRoutes(router *gin.Engine) {
 
 	handler.InitHandler()
 
-	titles := router.Group("/api/search")
+	titles := router.Group("/api/v1/search")
 	{
 		// fetch a list of a title search
 		titles.GET("", handler.GetSearch)
 	}
 
-	users := router.Group("/api/users")
+	users := router.Group("/api/v1/users")
 	{
 
 		// CRUD user routes
@@ -26,15 +26,6 @@ func initRoutes(router *gin.Engine) {
 		users.PUT("/profile", handler.UpdateUser)
 		users.DELETE("/profile", handler.DeleteUser)
 
-	}
-
-	comments := router.Group("/api/comments")
-	{
-		// comments routes
-		comments.POST("/:userID/:titleID")
-		comments.DELETE("/:userID/:commentID")
-		comments.GET("/title/:titleID")
-		comments.GET("/user/:userID")
 	}
 
 }
