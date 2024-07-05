@@ -30,6 +30,6 @@ func GetUserProfileByUsername(ctx *gin.Context) {
 		return
 	}
 
-	sendSuccess(ctx, "get-user-username", user)
+	sendSuccess(ctx, "get-user-username", user.Username)
 
 }

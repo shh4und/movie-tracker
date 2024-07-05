@@ -3,7 +3,8 @@ package config
 import (
 	"fmt"
 	"os"
-	"strconv"
+
+	"github.com/shh4und/movie-tracker/utils"
 
 	"github.com/joho/godotenv"
 	"gorm.io/gorm"
@@ -25,12 +26,6 @@ var Envs = GetEnvs()
 func Init() error {
 	var err error
 
-	// get the env file
-	err = godotenv.Load("../.env")
-	if err != nil {
-		return fmt.Errorf("Error loading .env file: %v", err)
-	}
-
 	db, err = InitSQLite()
 	if err != nil {
 		return fmt.Errorf("Error at initialize sqlite: %v", err)
@@ -42,14 +37,13 @@ func Init() error {
 func GetSQLite() *gorm.DB { return db }
 
 func GetEnvs() ENVvars {
-	exp, err := strconv.ParseInt(os.Getenv("JWT_EXP"), 10, 64)
-	if err != nil {
-		return ENVvars{}
-	}
+	// get the env file
+	godotenv.Load("../.env")
+
 	return ENVvars{
 		ApiKey:               os.Getenv("API_KEY"),
 		JwtToken:             os.Getenv("JWT_TK"),
-		JwtExpirationSeconds: exp,
+		JwtExpirationSeconds: utils.ParseInt(os.Getenv("JWT_EXP")),
 	}
 }
 
