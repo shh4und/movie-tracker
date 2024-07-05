@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/shh4und/movie-tracker/auth"
 	"github.com/shh4und/movie-tracker/schemas"
 )
 
@@ -23,11 +24,18 @@ func UpdateUser(ctx *gin.Context) {
 		sendError(ctx, http.StatusBadRequest, err.Error())
 		return
 	}
+
+	hashedPassword, err := auth.HashPassword(request.Password)
+	if err != nil {
+		logger.Errorf("error hashing password: %v", err.Error())
+		sendError(ctx, http.StatusInternalServerError, err.Error())
+	}
+
 	user := schemas.User{}
 	updateFields := schemas.User{
 		Username:  request.Username,
 		Email:     request.Email,
-		Password:  request.Password,
+		Password:  hashedPassword,
 		FirstName: request.FirstName,
 		PhotoURL:  request.PhotoURL,
 		Status:    request.Status,

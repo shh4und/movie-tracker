@@ -4,7 +4,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/shh4und/movie-tracker/handler/auth"
+	"github.com/shh4und/movie-tracker/auth"
 	"github.com/shh4und/movie-tracker/schemas"
 )
 
