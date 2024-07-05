@@ -9,6 +9,14 @@ import (
 )
 
 func GetUserProfileByUsername(ctx *gin.Context) {
+	validUser, exists := ctx.Get("validUser")
+	if !exists || !validUser.(bool) {
+		sendError(ctx, http.StatusUnauthorized, "unauthorized user")
+		return
+	}
+	userID := ctx.MustGet("userID")
+
+	fmt.Printf(">> logged user id: %v, valid user: %b", userID, validUser)
 	username := ctx.Query("username")
 
 	if username == "" {
