@@ -2,29 +2,35 @@ package router
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/shh4und/movie-tracker/auth"
+	"github.com/shh4und/movie-tracker/config"
 	"github.com/shh4und/movie-tracker/handler"
 )
 
 func initRoutes(router *gin.Engine) {
 
 	handler.InitHandler()
-
+	secret := []byte(config.Envs.JwtToken)
 	titles := router.Group("/api/v1/search")
 	{
 		// fetch a list of a title search
 		titles.GET("", handler.GetSearch)
 	}
 
-	users := router.Group("/api/v1/users")
+	// public routes
+	router.POST("/api/v1/register", handler.CreateUser) // create
+	router.POST("/api/v1/login", handler.LoginUser)     // authenticate
+
+	usersProtected := router.Group("/api/v1/users")
+	usersProtected.Use(auth.Authenticate(secret))
 	{
 
 		// CRUD user routes
-		users.POST("/register", handler.CreateUser) // create
-		users.POST("/login", handler.LoginUser)     // authenticate
+
 		// users.GET("/profile/id", handler.GetUserProfileByID)
-		users.GET("/profile/username", handler.GetUserProfileByUsername)
-		users.PUT("/profile", handler.UpdateUser)
-		users.DELETE("/profile", handler.DeleteUser)
+		usersProtected.GET("/profile", handler.GetUserProfileByUsername)
+		usersProtected.PUT("/update", handler.UpdateUser)
+		usersProtected.DELETE("/delete", handler.DeleteUser)
 
 	}
 
