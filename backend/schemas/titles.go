@@ -21,7 +21,7 @@ type Title struct {
 	Country    string
 	Awards     string
 	Poster     string
-	Ratings    []Rating `gorm:"foreignKey:TitleID"`
+	RatingsID  uint
 	Metascore  string
 	Type       string
 	DVD        string
@@ -37,6 +37,7 @@ type Rating struct {
 	TitleID uint
 	Source  string
 	Value   string
+	Title   Title `gorm:"foreignKey:TitleID;constraint:OnDelete:CASCADE"`
 }
 
 // Search representa uma pesquisa com resultados

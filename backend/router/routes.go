@@ -22,7 +22,7 @@ func initRoutes(router *gin.Engine) {
 	router.POST("/api/v1/login", handler.LoginUser)     // authenticate
 
 	usersProtected := router.Group("/api/v1/users")
-	usersProtected.Use(auth.Authenticate(secret))
+	usersProtected.Use(auth.Authenticate(secret)) // using middleware to verify the authenticate session
 	{
 
 		// CRUD user routes
