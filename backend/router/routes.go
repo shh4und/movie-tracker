@@ -11,26 +11,26 @@ func initRoutes(router *gin.Engine) {
 
 	handler.InitHandler()
 	secret := []byte(config.Envs.JwtToken)
-	titles := router.Group("/api/v1/search")
+	titles := router.Group("/api/v1")
 	{
 		// fetch a list of a title search
-		titles.GET("", handler.GetSearch)
+		titles.GET("/search", handler.GetSearch)
 	}
 
 	// public routes
 	router.POST("/api/v1/register", handler.CreateUser) // create
 	router.POST("/api/v1/login", handler.LoginUser)     // authenticate
 
-	usersProtected := router.Group("/api/v1/users")
+	usersProtected := router.Group("/api/v1")
 	usersProtected.Use(auth.Authenticate(secret)) // using middleware to verify the authenticate session
 	{
 
 		// CRUD user routes
 
 		// users.GET("/profile/id", handler.GetUserProfileByID)
-		usersProtected.GET("/profile", handler.GetUserProfileByUsername)
-		usersProtected.PUT("/update", handler.UpdateUser)
-		usersProtected.DELETE("/delete", handler.DeleteUser)
+		usersProtected.GET("/users/profile", handler.GetUserProfileByUsername)
+		usersProtected.PUT("/users/update", handler.UpdateUser)
+		usersProtected.DELETE("/users/delete", handler.DeleteUser)
 
 	}
 
