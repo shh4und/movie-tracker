@@ -3,19 +3,26 @@ package config
 import (
 	"fmt"
 	"os"
+	"strconv"
 
-	"github.com/shh4und/movie-tracker/utils"
-
+	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/joho/godotenv"
 	"gorm.io/gorm"
 )
 
 var (
-	db     *gorm.DB
-	logger *Logger
+	dbsqlite *gorm.DB
+	logger   *Logger
+	dbpool   *pgxpool.Pool
 )
 
-type ENVvars struct {
+type ConfigEnv struct {
+	PublicHost           string
+	Port                 string
+	DBUser               string
+	DBPassword           string
+	DBUrl                string
+	DBName               string
 	ApiKey               string
 	JwtToken             string
 	JwtExpirationSeconds int64
@@ -25,29 +32,62 @@ var Envs = GetEnvs()
 
 func Init() error {
 	var err error
-
-	db, err = InitSQLite()
+	dbsqlite, err = InitSQLite()
 	if err != nil {
 		return fmt.Errorf("Error at initialize sqlite: %v", err)
+	}
+
+	dbpool, err = InitPQSQL()
+	if err != nil {
+		return fmt.Errorf("Error at initialize PostgreSQL: %v", err)
 	}
 
 	return nil
 }
 
-func GetSQLite() *gorm.DB { return db }
+func GetSQLite() *gorm.DB { return dbsqlite }
 
-func GetEnvs() ENVvars {
+func GetPQSQL() *pgxpool.Pool { return dbpool }
+
+func GetEnvs() ConfigEnv {
 	// get the env file
-	godotenv.Load("../.env")
+	godotenv.Load()
 
-	return ENVvars{
-		ApiKey:               os.Getenv("API_KEY"),
-		JwtToken:             os.Getenv("JWT_TK"),
-		JwtExpirationSeconds: utils.ParseInt(os.Getenv("JWT_EXP")),
+	return ConfigEnv{
+		PublicHost:           getEnv("PUBLIC_HOST", "http://localhost"),
+		Port:                 getEnv("PORT", "8080"),
+		DBUser:               getEnv("DB_USER", "root"),
+		DBPassword:           getEnv("DB_PASS", "mypassword"),
+		DBUrl:                getEnv("DB_URL", "url"),
+		DBName:               getEnv("DB_NAME", "ecom"),
+		JwtToken:             getEnv("JWT_TK", "not-so-secret-now-is-it?"),
+		JwtExpirationSeconds: getEnvAsInt("JWT_EXP", 60),
 	}
 }
 
 func GetLogger(p string) *Logger {
 	logger = NewLogger(p)
 	return logger
+}
+
+// Gets the env by key or fallbacks
+func getEnv(key, fallback string) string {
+	if value, ok := os.LookupEnv(key); ok {
+		return value
+	}
+
+	return fallback
+}
+
+func getEnvAsInt(key string, fallback int64) int64 {
+	if value, ok := os.LookupEnv(key); ok {
+		i, err := strconv.ParseInt(value, 10, 64)
+		if err != nil {
+			return fallback
+		}
+
+		return i
+	}
+
+	return fallback
 }
