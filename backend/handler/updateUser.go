@@ -3,10 +3,11 @@ package handler
 import (
 	"fmt"
 	"net/http"
+	"strconv"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 	"github.com/shh4und/movie-tracker/auth"
-	"github.com/shh4und/movie-tracker/schemas"
 )
 
 func UpdateUser(ctx *gin.Context) {
@@ -24,34 +25,65 @@ func UpdateUser(ctx *gin.Context) {
 		sendError(ctx, http.StatusBadRequest, err.Error())
 		return
 	}
-
+	var updateFields []string
+	var updateValues []interface{}
 	hashedPassword, err := auth.HashPassword(request.Password)
 	if err != nil {
 		logger.Errorf("error hashing password: %v", err.Error())
 		sendError(ctx, http.StatusInternalServerError, err.Error())
 	}
 
-	user := schemas.User{}
-	updateFields := schemas.User{
-		Username:  request.Username,
-		Email:     request.Email,
-		Password:  hashedPassword,
-		FirstName: request.FirstName,
-		PhotoURL:  request.PhotoURL,
-		Status:    request.Status,
-		LastName:  request.LastName,
+	if request.Username != "" {
+		updateFields = append(updateFields, "username=$"+strconv.Itoa(len(updateValues)+1))
+		updateValues = append(updateValues, request.Username)
+
+	}
+	if request.Email != "" {
+		updateFields = append(updateFields, "email=$"+strconv.Itoa(len(updateValues)+1))
+		updateValues = append(updateValues, request.Email)
+
+	}
+	if request.Password != "" {
+		updateFields = append(updateFields, "password=$"+strconv.Itoa(len(updateValues)+1))
+		updateValues = append(updateValues, hashedPassword)
+
+	}
+	if request.FirstName != "" {
+		updateFields = append(updateFields, "first_name=$"+strconv.Itoa(len(updateValues)+1))
+		updateValues = append(updateValues, request.FirstName)
+
+	}
+	if request.LastName != "" {
+		updateFields = append(updateFields, "last_name=$"+strconv.Itoa(len(updateValues)+1))
+		updateValues = append(updateValues, request.LastName)
+
+	}
+	if request.PhotoURL != "" {
+		updateFields = append(updateFields, "photo_url=$"+strconv.Itoa(len(updateValues)+1))
+		updateValues = append(updateValues, request.PhotoURL)
+
+	}
+	if request.Status != "" {
+		updateFields = append(updateFields, "status=$"+strconv.Itoa(len(updateValues)+1))
+		updateValues = append(updateValues, request.Status)
+
 	}
 
-	if err := db.First(&user, id).Error; err != nil {
-		sendError(ctx, http.StatusNotFound, fmt.Sprintf("user with id: %s not found on the database", id))
-		return
-	}
-	if err := db.Model(&user).Updates(&updateFields).Error; err != nil {
-		logger.Errorf("error creating user: %v", err.Error())
-		sendError(ctx, http.StatusInternalServerError, fmt.Sprintf("error at update operation, user id: %s", id))
-		return
+	query := fmt.Sprintf("UPDATE users SET %s WHERE id=$%d RETURNING *", strings.Join(updateFields, ", "), len(updateValues)+1)
+	// _ = pgx.NamedArgs{
+	// 	"@Username": request.Username,
+	// 	"@ID":       id,
+	// }
+
+	updateValues = append(updateValues, id)
+
+	fmt.Println(query)
+	_, err = dbpg.DB.Query(ctx, query, updateValues...)
+	if err != nil {
+		logger.Errorf("error Query: %v", err.Error())
+		sendError(ctx, http.StatusInternalServerError, err.Error())
 	}
 
-	sendSuccess(ctx, "update-user", user)
+	sendSuccess(ctx, "update-user", request.Username)
 
 }

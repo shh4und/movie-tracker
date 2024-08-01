@@ -1,22 +1,20 @@
 package handler
 
 import (
-	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/shh4und/movie-tracker/config"
-	"gorm.io/gorm"
 )
 
 var (
 	logger *config.Logger
-	db     *gorm.DB
-	dbpq   *pgxpool.Pool
+	//db     *gorm.DB
+	dbpg   *config.Postsql
 	apiKEY string
 )
 
 func InitHandler() {
 	logger = config.GetLogger("handler")
-	db = config.GetSQLite()
-	dbpq = config.GetPQSQL()
+	//db = config.GetSQLite()
+	dbpg = config.GetPSQL()
 	apiKEY = config.Envs.ApiKey
 
 }

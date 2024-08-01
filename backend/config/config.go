@@ -11,10 +11,14 @@ import (
 )
 
 var (
-	dbsqlite *gorm.DB
-	logger   *Logger
-	dbpool   *pgxpool.Pool
+	dbsqlite   *gorm.DB
+	logger     *Logger
+	pgInstance *Postsql
 )
+
+type Postsql struct {
+	DB *pgxpool.Pool
+}
 
 type ConfigEnv struct {
 	PublicHost           string
@@ -37,7 +41,7 @@ func Init() error {
 		return fmt.Errorf("Error at initialize sqlite: %v", err)
 	}
 
-	dbpool, err = InitPQSQL()
+	pgInstance, err = InitPSQL()
 	if err != nil {
 		return fmt.Errorf("Error at initialize PostgreSQL: %v", err)
 	}
@@ -47,7 +51,7 @@ func Init() error {
 
 func GetSQLite() *gorm.DB { return dbsqlite }
 
-func GetPQSQL() *pgxpool.Pool { return dbpool }
+func GetPSQL() *Postsql { return pgInstance }
 
 func GetEnvs() ConfigEnv {
 	// get the env file

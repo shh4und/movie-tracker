@@ -48,8 +48,8 @@ func Authenticate(secret []byte) gin.HandlerFunc {
 			}
 		}
 
-		ctx.Set("userID", claims["userID"])
-		ctx.Set("validUser", true)
+		// ctx.Set("userID", claims["userID"])
+		// ctx.Set("validUser", true)
 
 		ctx.Next()
 	}

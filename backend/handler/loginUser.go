@@ -3,6 +3,7 @@ package handler
 import (
 	"net/http"
 
+	"github.com/jackc/pgx/v5"
 	"github.com/shh4und/movie-tracker/auth"
 	"github.com/shh4und/movie-tracker/config"
 
@@ -20,9 +21,15 @@ func LoginUser(ctx *gin.Context) {
 		return
 	}
 
-	user := schemas.User{}
+	var user schemas.User
 
-	if err := db.Where("username = ?", request.Username).First(&user).Error; err != nil {
+	query := "SELECT id, username, password FROM users WHERE username=@Username"
+	args := pgx.NamedArgs{
+		"Username": request.Username,
+	}
+
+	err := dbpg.DB.QueryRow(ctx, query, args).Scan(&user.ID, &user.Username, &user.Password)
+	if err != nil {
 		sendError(ctx, http.StatusBadRequest, "invalid username or password")
 		return
 	}
