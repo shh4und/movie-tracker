@@ -7,11 +7,9 @@ import (
 
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/joho/godotenv"
-	"gorm.io/gorm"
 )
 
 var (
-	dbsqlite   *gorm.DB
 	logger     *Logger
 	pgInstance *Postsql
 )
@@ -36,10 +34,6 @@ var Envs = GetEnvs()
 
 func Init() error {
 	var err error
-	dbsqlite, err = InitSQLite()
-	if err != nil {
-		return fmt.Errorf("Error at initialize sqlite: %v", err)
-	}
 
 	pgInstance, err = InitPSQL()
 	if err != nil {
@@ -48,8 +42,6 @@ func Init() error {
 
 	return nil
 }
-
-func GetSQLite() *gorm.DB { return dbsqlite }
 
 func GetPSQL() *Postsql { return pgInstance }
 
