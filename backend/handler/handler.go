@@ -6,14 +6,12 @@ import (
 
 var (
 	logger *config.Logger
-	//db     *gorm.DB
 	dbpg   *config.Postsql
 	apiKEY string
 )
 
 func InitHandler() {
 	logger = config.GetLogger("handler")
-	//db = config.GetSQLite()
 	dbpg = config.GetPSQL()
 	apiKEY = config.Envs.ApiKey
 

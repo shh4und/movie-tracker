@@ -1,12 +1,7 @@
 package schemas
 
-import (
-	"gorm.io/gorm"
-)
-
 // Title representa a tabela titles no banco de dados
 type Title struct {
-	gorm.Model
 	Title      string
 	Year       string
 	Rated      string
@@ -33,11 +28,10 @@ type Title struct {
 
 // Rating representa a tabela ratings no banco de dados
 type Rating struct {
-	gorm.Model
 	TitleID uint
 	Source  string
 	Value   string
-	Title   Title `gorm:"foreignKey:TitleID;constraint:OnDelete:CASCADE"`
+	Title   Title
 }
 
 // Search representa uma pesquisa com resultados
