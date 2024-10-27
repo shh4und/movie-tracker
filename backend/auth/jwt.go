@@ -11,15 +11,19 @@ import (
 func CreateJWT(secret []byte, userID uint) (string, error) {
 	expiration := time.Second * time.Duration(config.Envs.JwtExpirationSeconds)
 
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"userID":    strconv.Itoa(int(userID)),
-		"expiresAt": time.Now().Add(expiration).Unix(),
-	})
+	claims := &CustomClaims{
+		UserID: userID,
+		RegisteredClaims: jwt.RegisteredClaims{
+			Subject:   strconv.Itoa(int(userID)),
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(expiration)),
+		},
+	}
 
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	tokenString, err := token.SignedString(secret)
 	if err != nil {
 		return "", err
 	}
 
-	return tokenString, err
+	return tokenString, nil
 }

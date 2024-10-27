@@ -1,7 +1,7 @@
 package auth
 
 import (
-	"fmt"
+	"log"
 	"net/http"
 	"strings"
 	"time"
@@ -27,29 +27,26 @@ func Authenticate(secret []byte) gin.HandlerFunc {
 		}
 
 		tokenString := parts[1]
-		claims := jwt.MapClaims{}
+		claims := &CustomClaims{}
 		token, err := jwt.ParseWithClaims(tokenString, claims, func(token *jwt.Token) (interface{}, error) {
 			return secret, nil
 		})
 
 		if err != nil || !token.Valid {
+			log.Printf("Token parsing error: %v", err)
 			ctx.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid token"})
 			ctx.Abort()
 			return
 		}
 
-		if exp, ok := claims["expiresAt"].(float64); ok {
-			fmt.Printf("Expiration Time: %v, Current Time: %v\n", time.Unix(int64(exp), 0), time.Now())
-
-			if time.Unix(int64(exp), 0).Before(time.Now()) {
-				ctx.JSON(http.StatusUnauthorized, gin.H{"error": "Token has expired"})
-				ctx.Abort()
-				return
-			}
+		if claims.ExpiresAt != nil && claims.ExpiresAt.Time.Before(time.Now()) {
+			log.Printf("Token expired at: %v", claims.ExpiresAt.Time)
+			ctx.JSON(http.StatusUnauthorized, gin.H{"error": "Token has expired"})
+			ctx.Abort()
+			return
 		}
-
-		// ctx.Set("userID", claims["userID"])
-		// ctx.Set("validUser", true)
+		log.Printf("Token valid for user ID: %d", claims.UserID)
+		ctx.Set("userID", claims.Subject)
 
 		ctx.Next()
 	}
