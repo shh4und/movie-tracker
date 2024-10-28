@@ -5,7 +5,6 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/jackc/pgx/v5"
 )
 
 func DeleteUser(ctx *gin.Context) {
@@ -16,14 +15,9 @@ func DeleteUser(ctx *gin.Context) {
 		return
 	}
 
-	query := "DELETE FROM users WHERE id=@ID"
-	args := pgx.NamedArgs{
-		"ID": id,
-	}
+	query := "DELETE FROM users WHERE id=$1"
 
-	// var user schemas.User
-
-	_, err := dbpg.DB.Exec(ctx, query, args)
+	_, err := dbpg.DB.Exec(ctx, query, id)
 	if err != nil {
 		sendError(ctx, http.StatusInternalServerError, fmt.Sprintf("error deleting user with id:%s", id))
 		return

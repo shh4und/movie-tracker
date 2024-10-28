@@ -18,7 +18,11 @@ func UpdateUser(ctx *gin.Context) {
 	}
 
 	request := UpdateUserRequest{}
-	ctx.BindJSON(&request)
+	if err := ctx.BindJSON(&request); err != nil {
+		logger.Errorf("request binding error: %v", err)
+		sendError(ctx, http.StatusBadRequest, err.Error())
+		return
+	}
 
 	if err := request.Validate(); err != nil {
 		logger.Errorf("request validation error: %v", err)
@@ -31,6 +35,7 @@ func UpdateUser(ctx *gin.Context) {
 	if err != nil {
 		logger.Errorf("error hashing password: %v", err.Error())
 		sendError(ctx, http.StatusInternalServerError, err.Error())
+		return
 	}
 
 	if request.Username != "" {
@@ -70,18 +75,14 @@ func UpdateUser(ctx *gin.Context) {
 	}
 
 	query := fmt.Sprintf("UPDATE users SET %s WHERE id=$%d RETURNING *", strings.Join(updateFields, ", "), len(updateValues)+1)
-	// _ = pgx.NamedArgs{
-	// 	"@Username": request.Username,
-	// 	"@ID":       id,
-	// }
 
 	updateValues = append(updateValues, id)
 
-	fmt.Println(query)
 	_, err = dbpg.DB.Query(ctx, query, updateValues...)
 	if err != nil {
-		logger.Errorf("error Query: %v", err.Error())
+		logger.Errorf("error updating user: %v", err.Error())
 		sendError(ctx, http.StatusInternalServerError, err.Error())
+		return
 	}
 
 	sendSuccess(ctx, "update-user", request.Username)
