@@ -73,14 +73,28 @@ func UpdateUser(ctx *gin.Context) {
 		updateValues = append(updateValues, request.Status)
 
 	}
+	tx, err := dbpg.DB.Begin(ctx)
+
+	if err != nil {
+		logger.Errorf("error starting transaction: %v", err)
+		sendError(ctx, http.StatusInternalServerError, err.Error())
+		return
+	}
+	defer tx.Rollback(ctx)
 
 	query := fmt.Sprintf("UPDATE users SET %s WHERE id=$%d RETURNING *", strings.Join(updateFields, ", "), len(updateValues)+1)
 
 	updateValues = append(updateValues, id)
 
-	_, err = dbpg.DB.Query(ctx, query, updateValues...)
+	_, err = tx.Query(ctx, query, updateValues...)
 	if err != nil {
 		logger.Errorf("error updating user: %v", err.Error())
+		sendError(ctx, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	if err := tx.Commit(ctx); err != nil {
+		logger.Errorf("error committing transaction: %v", err)
 		sendError(ctx, http.StatusInternalServerError, err.Error())
 		return
 	}

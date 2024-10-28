@@ -28,11 +28,27 @@ func CreateUser(ctx *gin.Context) {
 		sendError(ctx, http.StatusInternalServerError, err.Error())
 		return
 	}
+
+	tx, err := dbpg.DB.Begin(ctx)
+
+	if err != nil {
+		logger.Errorf("error starting transaction: %v", err)
+		sendError(ctx, http.StatusInternalServerError, err.Error())
+		return
+	}
+	defer tx.Rollback(ctx)
+
 	query := "INSERT INTO users (username, email, password, minor) VALUES ($1, $2, $3, $4)"
 
-	_, err = dbpg.DB.Exec(ctx, query, request.Username, request.Email, hashedPassword, request.Minor)
+	_, err = tx.Exec(ctx, query, request.Username, request.Email, hashedPassword, request.Minor)
 	if err != nil {
 		logger.Errorf("error creating user: %v", err.Error())
+		sendError(ctx, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	if err := tx.Commit(ctx); err != nil {
+		logger.Errorf("error committing transaction: %v", err)
 		sendError(ctx, http.StatusInternalServerError, err.Error())
 		return
 	}
