@@ -38,9 +38,9 @@ func CreateUser(ctx *gin.Context) {
 	}
 	defer tx.Rollback(ctx)
 
-	query := "INSERT INTO users (username, email, password, minor) VALUES ($1, $2, $3, $4)"
+	query := "INSERT INTO users (username, email, password) VALUES ($1, $2, $3)"
 
-	_, err = tx.Exec(ctx, query, request.Username, request.Email, hashedPassword, request.Minor)
+	_, err = tx.Exec(ctx, query, request.Username, request.Email, hashedPassword)
 	if err != nil {
 		logger.Errorf("error creating user: %v", err.Error())
 		sendError(ctx, http.StatusInternalServerError, err.Error())
