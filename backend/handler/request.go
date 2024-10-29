@@ -64,33 +64,26 @@ func (r *UpdateUserRequest) Validate() error {
 }
 
 type TitleRequest struct {
-	Title      string   `json:"Title"`
-	Year       string   `json:"Year"`
-	Rated      string   `json:"Rated"`
-	Released   string   `json:"Released"`
-	Runtime    string   `json:"Runtime"`
-	Genre      string   `json:"Genre"`
-	Director   string   `json:"Director"`
-	Writer     string   `json:"Writer"`
-	Actors     string   `json:"Actors"`
-	Plot       string   `json:"Plot"`
-	Language   string   `json:"Language"`
-	Country    string   `json:"Country"`
-	Awards     string   `json:"Awards"`
-	Poster     string   `json:"Poster"`
-	Ratings    []Rating `json:"Ratings"`
-	Metascore  string   `json:"Metascore"`
-	Type       string   `json:"Type"`
-	DVD        string   `json:"DVD"`
-	BoxOffice  string   `json:"BoxOffice"`
-	Production string   `json:"Production"`
-	Website    string   `json:"Website"`
-	Response   string   `json:"Response"`
-}
-
-type Rating struct {
-	Source string `json:"Source"`
-	Value  string `json:"Value"`
+	ID         uint   `json:"id"`
+	Title      string `json:"Title"`
+	Year       string `json:"Year"`
+	Rated      string `json:"Rated"`
+	Released   string `json:"Released"`
+	Runtime    string `json:"Runtime"`
+	Genre      string `json:"Genre"`
+	Director   string `json:"Director"`
+	Writer     string `json:"Writer"`
+	Actors     string `json:"Actors"`
+	Plot       string `json:"Plot"`
+	Language   string `json:"Language"`
+	Country    string `json:"Country"`
+	Awards     string `json:"Awards"`
+	Poster     string `json:"Poster"`
+	IMDBRating string `json:"imdbRating"`
+	IMDBID     string `json:"imdbID"`
+	Type       string `json:"Type"`
+	Production string `json:"Production"`
+	Response   string `json:"Response"`
 }
 
 type SearchRequest struct {
@@ -106,7 +99,6 @@ func (r *SearchRequest) Validate() error {
 	return nil
 }
 
-// Create User
 type LoginUserRequest struct {
 	Username string `json:"username"`
 	Password string `json:"password"`
