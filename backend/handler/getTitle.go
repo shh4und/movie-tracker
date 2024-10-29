@@ -6,7 +6,7 @@ import (
 	"os"
 
 	"github.com/gin-gonic/gin"
-	"github.com/shh4und/movie-tracker/structs"
+	"github.com/shh4und/movie-tracker/models"
 )
 
 // handler for fetching a list of a title search
@@ -30,7 +30,7 @@ func GetTitle(ctx *gin.Context) {
 		return
 	}
 
-	var title structs.Title
+	var title models.Title
 	if err := json.NewDecoder(resp.Body).Decode(&title); err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return

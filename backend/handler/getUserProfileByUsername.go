@@ -5,7 +5,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/shh4und/movie-tracker/schemas"
+	"github.com/shh4und/movie-tracker/models"
 )
 
 func GetUserProfileByUsername(ctx *gin.Context) {
@@ -19,7 +19,7 @@ func GetUserProfileByUsername(ctx *gin.Context) {
 
 	query := "SELECT username FROM users WHERE username=$1"
 
-	var user schemas.User
+	var user models.User
 
 	err := dbpg.DB.QueryRow(ctx, query, username).Scan(&user.Username)
 	if err != nil {

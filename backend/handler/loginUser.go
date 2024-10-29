@@ -5,9 +5,9 @@ import (
 
 	"github.com/shh4und/movie-tracker/auth"
 	"github.com/shh4und/movie-tracker/config"
+	"github.com/shh4und/movie-tracker/models"
 
 	"github.com/gin-gonic/gin"
-	"github.com/shh4und/movie-tracker/schemas"
 )
 
 func LoginUser(ctx *gin.Context) {
@@ -25,7 +25,7 @@ func LoginUser(ctx *gin.Context) {
 		return
 	}
 
-	var user schemas.User
+	var user models.User
 
 	query := "SELECT id, username, password FROM users WHERE username=$1"
 
