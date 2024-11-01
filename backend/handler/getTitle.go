@@ -11,7 +11,7 @@ import (
 
 // handler for fetching a list of a title search
 func GetTitle(ctx *gin.Context) {
-	titleName := ctx.Param("title")
+	titleName := ctx.Query("title")
 	apiKey := os.Getenv("API_KEY")
 	if apiKey == "" {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "API_KEY not set"})
