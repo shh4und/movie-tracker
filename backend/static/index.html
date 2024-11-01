@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Movie Tracker</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            background-color: #333;
+            color: white;
+        }
+        header button {
+            margin-left: 10px;
+        }
+        .container {
+            padding: 20px;
+        }
+        .search-bar {
+            margin-bottom: 20px;
+        }
+        .movie-info {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .movie-info img {
+            max-width: 300px;
+            margin-bottom: 20px;
+        }
+        .movie-info div {
+            margin-bottom: 10px;
+        }
+        .buttons {
+            margin-top: 20px;
+        }
+        .buttons button {
+            margin-right: 10px;
+        }
+        .comments {
+            margin-top: 20px;
+        }
+        .comments ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        .comments li {
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Movie Tracker</h1>
+        <div>
+            <button onclick="register()">Register</button>
+            <button onclick="login()">Login</button>
+        </div>
+    </header>
+    <div class="container">
+        <div class="search-bar">
+            <input type="text" id="searchInput" placeholder="Search for a title...">
+            <button onclick="searchTitle()">Search</button>
+        </div>
+        <div class="movie-info" id="movieInfo"></div>
+        <div class="buttons" id="actionButtons"></div>
+        <div class="comments" id="commentsSection">
+            <h3>Comments</h3>
+            <ul id="commentsList"></ul>
+            <input type="text" id="commentInput" placeholder="Add a comment...">
+            <button onclick="addComment()">Comment</button>
+        </div>
+    </div>
+
+    <script>
+        function register() {
+            // Redirect to register page
+            window.location.href = '/register';
+        }
+
+        function login() {
+            // Redirect to login page
+            window.location.href = '/login';
+        }
+
+        function searchTitle() {
+            const title = document.getElementById('searchInput').value;
+            fetch(`/api/v1/titles/search?title=${title}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.Response === "True") {
+                        displayMovieInfo(data);
+                    } else {
+                        alert("Title not found");
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+        }
+
+        function displayMovieInfo(data) {
+            const movieInfo = document.getElementById('movieInfo');
+            movieInfo.innerHTML = `
+                <img src="${data.Poster}" alt="${data.Title}">
+                <div><strong>Title:</strong> ${data.Title}</div>
+                <div><strong>Year:</strong> ${data.Year}</div>
+                <div><strong>Released:</strong> ${data.Released}</div>
+                <div><strong>Runtime:</strong> ${data.Runtime}</div>
+                <div><strong>Genre:</strong> ${data.Genre}</div>
+                <div><strong>Director:</strong> ${data.Director}</div>
+            `;
+
+            const actionButtons = document.getElementById('actionButtons');
+            actionButtons.innerHTML = `
+                <button>Rating</button>
+                <button>Favorites</button>
+                <button>Watch Later</button>
+                <button>Watched</button>
+            `;
+
+            // Clear comments section
+            document.getElementById('commentsList').innerHTML = '';
+            document.getElementById('commentInput').value = '';
+        }
+
+        function addComment() {
+            const comment = document.getElementById('commentInput').value;
+            if (comment) {
+                const commentsList = document.getElementById('commentsList');
+                const li = document.createElement('li');
+                li.textContent = comment;
+                commentsList.appendChild(li);
+                document.getElementById('commentInput').value = '';
+            }
+        }
+    </script>
+</body>
+</html>
