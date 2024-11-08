@@ -9,6 +9,12 @@ func Init() {
 	// Initialize router (gin.Engine) with the default configs
 	router := gin.Default()
 
+	// Serve static files from the "static" directory
+	router.Static("/static", "./static")
+	// Serve the main HTML files directly
+	router.StaticFile("/index", "./static/index.html")
+	router.StaticFile("/register", "./static/register.html")
+	router.StaticFile("/login", "./static/login.html")
 	// Initialize routes
 	initRoutes(router)
 
