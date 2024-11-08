@@ -5,11 +5,13 @@ import (
 	"github.com/shh4und/movie-tracker/auth"
 	"github.com/shh4und/movie-tracker/config"
 	"github.com/shh4und/movie-tracker/handler"
+	"github.com/shh4und/movie-tracker/services"
 )
 
 func initRoutes(router *gin.Engine) {
 
 	handler.InitHandler()
+	services.InitServices()
 	secret := []byte(config.Envs.JwtToken)
 
 	// Public routes
@@ -18,7 +20,7 @@ func initRoutes(router *gin.Engine) {
 		public.POST("/register", handler.CreateUser) // create
 		public.POST("/login", handler.LoginUser)     // authenticate
 		// fetch a list of a title search
-		public.GET("/titles/search", handler.GetSearch)
+		public.GET("/titles/search", handler.GetTitle)
 	}
 
 	// Protected routes
@@ -29,6 +31,13 @@ func initRoutes(router *gin.Engine) {
 		protected.GET("/users/profile", handler.GetUserProfileByUsername)
 		protected.PUT("/users/update", handler.UpdateUser)
 		protected.DELETE("/users/delete", handler.DeleteUser)
+
+		// User actions
+		protected.POST("/rate", handler.AddRating)
+		protected.POST("/comment", handler.AddComment)
+		protected.POST("/favorite", handler.AddFavorite)
+		protected.POST("/watchlater", handler.AddWatchLater)
+		protected.POST("/watched", handler.AddWatched)
 	}
 
 }
