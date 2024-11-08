@@ -47,6 +47,10 @@ func LoginUser(ctx *gin.Context) {
 		return
 	}
 
-	sendSuccess(ctx, "login-user", token)
+	sendSuccess(ctx, "login-user", gin.H{
+		"token":    token,
+		"userID":   user.ID,
+		"username": user.Username,
+	})
 
 }
