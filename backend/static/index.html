@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,6 +9,7 @@
         body {
             font-family: Arial, sans-serif;
         }
+
         header {
             display: flex;
             justify-content: space-between;
@@ -16,56 +18,75 @@
             background-color: #333;
             color: white;
         }
+
         header button {
             margin-left: 10px;
         }
+
+        header button #logOutButton {
+            display: none;
+        }
+
         .container {
             padding: 20px;
         }
+
         .search-bar {
             margin-bottom: 20px;
         }
+
         .movie-info {
             display: flex;
             flex-direction: column;
             align-items: center;
         }
+
         .movie-info img {
             max-width: 300px;
             margin-bottom: 20px;
         }
+
         .movie-info div {
             margin-bottom: 10px;
         }
+
         .buttons {
             margin-top: 20px;
         }
+
         .buttons button {
             margin-right: 10px;
         }
+
         .comments {
+            display: none;
             margin-top: 20px;
         }
+
         .comments ul {
             list-style-type: none;
             padding: 0;
         }
+
         .comments li {
             margin-bottom: 10px;
         }
     </style>
 </head>
+
 <body>
     <header>
         <h1>Movie Tracker</h1>
         <div>
-            <button onclick="register()">Register</button>
-            <button onclick="login()">Login</button>
+            <span id="usernameDisplay"></span>
+            <button id="registerButton" onclick="register()">Register</button>
+            <button id="loginButton" onclick="login()">Login</button>
+            <button id="logOutButton" onclick="logOut()">Log Out</button>
         </div>
     </header>
     <div class="container">
         <div class="search-bar">
-            <input type="text" id="searchInput" placeholder="Search for a title...">
+            <input type="text" id="searchInput" placeholder="Seah for a title...">
             <button onclick="searchTitle()">Search</button>
         </div>
         <div class="movie-info" id="movieInfo"></div>
@@ -93,11 +114,13 @@
             const title = document.getElementById('searchInput').value;
             fetch(`/api/v1/titles/search?title=${title}`)
                 .then(response => response.json())
-                .then(data => {
-                    if (data.Response === "True") {
-                        displayMovieInfo(data);
+                .then(resp => {
+                    if (resp.success) {
+                        displayMovieInfo(resp.data);
+                        console.log(resp)
                     } else {
                         alert("Title not found");
+                        console.log(resp)
                     }
                 })
                 .catch(error => console.error('Error:', error));
@@ -123,6 +146,10 @@
                 <button>Watched</button>
             `;
 
+            // Exibir a seção de comentários
+            const commentsSection = document.getElementById('commentsSection');
+            commentsSection.style.display = 'block';
+
             // Clear comments section
             document.getElementById('commentsList').innerHTML = '';
             document.getElementById('commentInput').value = '';
@@ -138,6 +165,41 @@
                 document.getElementById('commentInput').value = '';
             }
         }
+
+        function checkLogged(){
+            const logged = localStorage.getItem('logged');
+            const username = localStorage.getItem('username');
+            if (logged && username){
+                document.getElementById('usernameDisplay').textContent = `Logged in as: ${username}`;
+                const registerButton = document.getElementById('registerButton');
+                registerButton.style.display = 'none';
+                const loginButton = document.getElementById('loginButton');
+                loginButton.style.display = 'none';
+                const logOutButton = document.getElementById('logOutButton');
+                logOutButton.style.display = 'inline-block';
+
+            }else{
+                document.getElementById('usernameDisplay').textContent = '';
+                const registerButton = document.getElementById('registerButton');
+                registerButton.style.display = '';
+                const loginButton = document.getElementById('loginButton');
+                loginButton.style.display = '';
+                const logOutButton = document.getElementById('logOutButton');
+                logOutButton.style.display = 'none';
+            }
+        }
+
+        function logOut(){
+            alert("You've been logged out");
+            localStorage.setItem('logged', false);
+            localStorage.removeItem('username');
+            localStorage.removeItem('token');
+            checkLogged();
+        }
+
+        // Chamar a função displayUsername ao carregar a página
+        window.onload = checkLogged;
     </script>
 </body>
+
 </html>
