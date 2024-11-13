@@ -66,6 +66,7 @@
                     alert('Login successful');
                     localStorage.setItem('token', resp.data.token);
                     localStorage.setItem('username', resp.data.username);
+                    localStorage.setItem('user_id', resp.data.userID);
                     localStorage.setItem('logged', true);
                     window.location.href = '/static';
                 } else {
