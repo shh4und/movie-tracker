@@ -34,9 +34,15 @@ func initRoutes(router *gin.Engine) {
 
 		// User actions
 		protected.POST("/rate", handler.AddRating)
+		protected.DELETE("/rate", handler.RemoveRating)
+
 		protected.POST("/comment", handler.AddComment)
+
 		protected.POST("/favorite", handler.AddFavorite)
+		protected.DELETE("/favorite", handler.RemoveFavorite)
+
 		protected.POST("/watchlater", handler.AddWatchLater)
+
 		protected.POST("/watched", handler.AddWatched)
 	}
 
