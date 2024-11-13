@@ -23,7 +23,7 @@
             margin-left: 10px;
         }
 
-        header button #logOutButton {
+        header button#logOutButton {
             display: none;
         }
 
@@ -86,7 +86,7 @@
     </header>
     <div class="container">
         <div class="search-bar">
-            <input type="text" id="searchInput" placeholder="Seah for a title...">
+            <input type="text" id="searchInput" placeholder="Search for a title...">
             <button onclick="searchTitle()">Search</button>
         </div>
         <div class="movie-info" id="movieInfo"></div>
@@ -117,10 +117,8 @@
                 .then(resp => {
                     if (resp.success) {
                         displayMovieInfo(resp.data);
-                        console.log(resp)
                     } else {
                         alert("Title not found");
-                        console.log(resp)
                     }
                 })
                 .catch(error => console.error('Error:', error));
@@ -140,8 +138,8 @@
 
             const actionButtons = document.getElementById('actionButtons');
             actionButtons.innerHTML = `
-                <button>Rating</button>
-                <button>Favorites</button>
+                <button onclick="addRating('${data.imdbID}')">Rating</button>
+                <button onclick="addFavorite('${data.imdbID}')">Favorites</button>
                 <button>Watch Later</button>
                 <button>Watched</button>
             `;
@@ -153,6 +151,54 @@
             // Clear comments section
             document.getElementById('commentsList').innerHTML = '';
             document.getElementById('commentInput').value = '';
+        }
+
+        function addRating(imdbID) {
+            const rating = prompt("Enter your rating (1-10):");
+            if (rating) {
+                fetch('/api/v1/rate', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + localStorage.getItem('token')
+                    },
+                    body: JSON.stringify({ title_imdbID: imdbID, rating: parseInt(rating) })
+                })
+                .then(response => response.json())
+                .then(resp => {
+                    if (resp.success) {
+                        alert('Rating added successfully');
+                        console.log(resp.data)
+                    } else {
+                        alert('Failed to add rating: ' + resp.message);
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+            }
+        }
+
+        function addFavorite(titleIMDbID) {
+            const userID = localStorage.getItem('user_id')
+            if (userID) {
+                fetch('/api/v1/favorite', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + localStorage.getItem('token')
+                    },
+                    body: JSON.stringify({ title_imdbID: titleIMDbID})
+                })
+                .then(response => response.json())
+                .then(resp => {
+                    if (resp.success) {
+                        alert('Favorite added successfully');
+                        console.log(resp.data)
+                    } else {
+                        alert('Failed to add rating: ' + resp.message);
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+            }
         }
 
         function addComment() {
