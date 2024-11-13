@@ -2,19 +2,14 @@
 -- Please log an issue at https://github.com/pgadmin-org/pgadmin4/issues/new/choose if you find any bugs, including reproduction steps.
 BEGIN;
 
-CREATE TABLE IF NOT EXISTS public.users
+
+CREATE TABLE IF NOT EXISTS public.comments
 (
     id serial NOT NULL,
-    username character varying(50) COLLATE pg_catalog."default" NOT NULL,
-    email character varying(100) COLLATE pg_catalog."default" NOT NULL,
-    password character varying(100) COLLATE pg_catalog."default" NOT NULL,
-    first_name character varying(50) COLLATE pg_catalog."default",
-    last_name character varying(50) COLLATE pg_catalog."default",
-    photo_url character varying(255) COLLATE pg_catalog."default",
-    status character varying(255) COLLATE pg_catalog."default",
-    CONSTRAINT users_pkey PRIMARY KEY (id),
-    CONSTRAINT users_email_key UNIQUE (email),
-    CONSTRAINT users_username_key UNIQUE (username)
+    user_id integer,
+    title_id integer NOT NULL,
+    text text COLLATE pg_catalog."default" NOT NULL,
+    CONSTRAINT comments_pkey PRIMARY KEY (id)
 );
 
 CREATE TABLE IF NOT EXISTS public.titles
@@ -44,21 +39,11 @@ CREATE TABLE IF NOT EXISTS public.titles
     CONSTRAINT titles_pkey PRIMARY KEY (id)
 );
 
-CREATE TABLE IF NOT EXISTS public.comments
-(
-    id serial NOT NULL,
-    user_id integer,
-    movie_id integer NOT NULL,
-    text text COLLATE pg_catalog."default" NOT NULL,
-    CONSTRAINT comments_pkey PRIMARY KEY (id)
-);
-
-
 CREATE TABLE IF NOT EXISTS public.user_favorites
 (
     id serial NOT NULL,
     user_id integer NOT NULL,
-    movie_id integer NOT NULL,
+    title_id integer NOT NULL,
     CONSTRAINT user_favorites_pkey PRIMARY KEY (id)
 );
 
@@ -66,17 +51,31 @@ CREATE TABLE IF NOT EXISTS public.user_ratings
 (
     id serial NOT NULL,
     user_id integer NOT NULL,
-    movie_id integer NOT NULL,
+    title_id integer NOT NULL,
     rating integer,
     CONSTRAINT user_ratings_pkey PRIMARY KEY (id)
 );
 
+CREATE TABLE IF NOT EXISTS public.users
+(
+    id serial NOT NULL,
+    username character varying(50) COLLATE pg_catalog."default" NOT NULL,
+    email character varying(100) COLLATE pg_catalog."default" NOT NULL,
+    password character varying(100) COLLATE pg_catalog."default" NOT NULL,
+    first_name character varying(50) COLLATE pg_catalog."default",
+    last_name character varying(50) COLLATE pg_catalog."default",
+    photo_url character varying(255) COLLATE pg_catalog."default",
+    status character varying(255) COLLATE pg_catalog."default",
+    CONSTRAINT users_pkey PRIMARY KEY (id),
+    CONSTRAINT users_email_key UNIQUE (email),
+    CONSTRAINT users_username_key UNIQUE (username)
+);
 
 CREATE TABLE IF NOT EXISTS public.watch_later
 (
     id serial NOT NULL,
     user_id integer NOT NULL,
-    movie_id integer NOT NULL,
+    title_id integer NOT NULL,
     CONSTRAINT watch_later_pkey PRIMARY KEY (id)
 );
 
@@ -84,13 +83,13 @@ CREATE TABLE IF NOT EXISTS public.watched_movies
 (
     id serial NOT NULL,
     user_id integer NOT NULL,
-    movie_id integer NOT NULL,
+    title_id integer NOT NULL,
     watched_on timestamp without time zone,
     CONSTRAINT watched_movies_pkey PRIMARY KEY (id)
 );
 
 ALTER TABLE IF EXISTS public.comments
-    ADD CONSTRAINT comments_movie_id_fkey FOREIGN KEY (movie_id)
+    ADD CONSTRAINT comments_title_id_fkey FOREIGN KEY (title_id)
     REFERENCES public.titles (id) MATCH SIMPLE
     ON UPDATE NO ACTION
     ON DELETE CASCADE;
@@ -104,7 +103,7 @@ ALTER TABLE IF EXISTS public.comments
 
 
 ALTER TABLE IF EXISTS public.user_favorites
-    ADD CONSTRAINT user_favorites_movie_id_fkey FOREIGN KEY (movie_id)
+    ADD CONSTRAINT user_favorites_title_id_fkey FOREIGN KEY (title_id)
     REFERENCES public.titles (id) MATCH SIMPLE
     ON UPDATE NO ACTION
     ON DELETE CASCADE;
@@ -118,7 +117,7 @@ ALTER TABLE IF EXISTS public.user_favorites
 
 
 ALTER TABLE IF EXISTS public.user_ratings
-    ADD CONSTRAINT user_ratings_movie_id_fkey FOREIGN KEY (movie_id)
+    ADD CONSTRAINT user_ratings_title_id_fkey FOREIGN KEY (title_id)
     REFERENCES public.titles (id) MATCH SIMPLE
     ON UPDATE NO ACTION
     ON DELETE CASCADE;
@@ -132,7 +131,7 @@ ALTER TABLE IF EXISTS public.user_ratings
 
 
 ALTER TABLE IF EXISTS public.watch_later
-    ADD CONSTRAINT watch_later_movie_id_fkey FOREIGN KEY (movie_id)
+    ADD CONSTRAINT watch_later_title_id_fkey FOREIGN KEY (title_id)
     REFERENCES public.titles (id) MATCH SIMPLE
     ON UPDATE NO ACTION
     ON DELETE CASCADE;
@@ -146,7 +145,7 @@ ALTER TABLE IF EXISTS public.watch_later
 
 
 ALTER TABLE IF EXISTS public.watched_movies
-    ADD CONSTRAINT watched_movies_movie_id_fkey FOREIGN KEY (movie_id)
+    ADD CONSTRAINT watched_movies_title_id_fkey FOREIGN KEY (title_id)
     REFERENCES public.titles (id) MATCH SIMPLE
     ON UPDATE NO ACTION
     ON DELETE CASCADE;
