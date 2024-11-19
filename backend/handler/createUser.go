@@ -38,7 +38,7 @@ func CreateUser(ctx *gin.Context) {
 	}
 	defer tx.Rollback(ctx)
 
-	query := "INSERT INTO users (username, email, password) VALUES ($1, $2, $3)"
+	query := "INSERT INTO tracker.users (username, email, password) VALUES ($1, $2, $3)"
 
 	_, err = tx.Exec(ctx, query, request.Username, request.Email, hashedPassword)
 	if err != nil {

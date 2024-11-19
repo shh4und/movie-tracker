@@ -35,38 +35,42 @@ type Search struct {
 	Response     string  `json:"Response"`
 }
 
-// User represents the users table
 type User struct {
-	ID        uint   `json:"id"`
-	Username  string `json:"username"`
-	Email     string `json:"email"`
-	Password  string `json:"password"`
-	FirstName string `json:"first_name"`
-	LastName  string `json:"last_name"`
-	PhotoURL  string `json:"photo_url"`
-	Status    string `json:"status"`
+	ID             uint      `json:"id"`
+	Username       string    `json:"username"`
+	Email          string    `json:"email"`
+	Password       string    `json:"password"`
+	FirstName      string    `json:"first_name"`
+	LastName       string    `json:"last_name"`
+	ProfilePicture string    `json:"profile_picture"` // Renomear de photo_url
+	Status         string    `json:"status"`
+	CreatedAt      time.Time `json:"created_at"` // Adicionar
+	UpdatedAt      time.Time `json:"updated_at"` // Adicionar
 }
 
 // UserRating represents the user_ratings table
 type UserRating struct {
-	ID      uint `json:"id"`
-	UserID  uint `json:"user_id"`
-	TitleID uint `json:"title_id"`
-	Rating  int  `json:"rating"`
+	ID        uint      `json:"id"`
+	UserID    uint      `json:"user_id"`
+	TitleID   uint      `json:"title_id"`
+	Rating    int       `json:"rating"`
+	CreatedAt time.Time `json:"created_at"` // Adicionar
 }
 
 // UserFavorite represents the user_favorites table
 type UserFavorite struct {
-	ID      uint `json:"id"`
-	UserID  uint `json:"user_id"`
-	TitleID uint `json:"title_id"`
+	ID        uint      `json:"id"`
+	UserID    uint      `json:"user_id"`
+	TitleID   uint      `json:"title_id"`
+	CreatedAt time.Time `json:"created_at"` // Adicionar
 }
 
 // WatchLater represents the watch_later table
 type WatchLater struct {
-	ID      uint `json:"id"`
-	UserID  uint `json:"user_id"`
-	TitleID uint `json:"title_id"`
+	ID        uint      `json:"id"`
+	UserID    uint      `json:"user_id"`
+	TitleID   uint      `json:"title_id"`
+	CreatedAt time.Time `json:"created_at"` // Adicionar
 }
 
 // WatchedMovie represents the watched_movies table
@@ -75,12 +79,14 @@ type WatchedMovie struct {
 	UserID    uint      `json:"user_id"`
 	TitleID   uint      `json:"title_id"`
 	WatchedOn time.Time `json:"watched_on"`
+	CreatedAt time.Time `json:"created_at"` // Adicionar
 }
 
 // Comment represents the comments table
 type Comment struct {
-	ID      uint   `json:"id"`
-	UserID  uint   `json:"user_id"`
-	TitleID uint   `json:"title_id"`
-	Text    string `json:"text"`
+	ID        uint      `json:"id"`
+	UserID    uint      `json:"user_id"`
+	TitleID   uint      `json:"title_id"`
+	Text      string    `json:"text"`
+	CreatedAt time.Time `json:"created_at"` // Adicionar
 }

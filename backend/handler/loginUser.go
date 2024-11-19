@@ -27,7 +27,7 @@ func LoginUser(ctx *gin.Context) {
 
 	var user models.User
 
-	query := "SELECT id, username, password FROM users WHERE username=$1"
+	query := "SELECT id, username, password FROM tracker.users WHERE username=$1"
 
 	err := dbpg.DB.QueryRow(ctx, query, request.Username).Scan(&user.ID, &user.Username, &user.Password)
 	if err != nil {
