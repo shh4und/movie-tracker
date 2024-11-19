@@ -1,0 +1,65 @@
+body {
+    font-family: Arial, sans-serif;
+}
+
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    background-color: #333;
+    color: white;
+}
+
+header button {
+    margin-left: 10px;
+}
+
+header button#logOutButton {
+    display: none;
+}
+
+.container {
+    padding: 20px;
+}
+
+.search-bar {
+    margin-bottom: 20px;
+}
+
+.movie-info {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.movie-info img {
+    max-width: 300px;
+    margin-bottom: 20px;
+}
+
+.movie-info div {
+    margin-bottom: 10px;
+}
+
+.buttons {
+    margin-top: 20px;
+}
+
+.buttons button {
+    margin-right: 10px;
+}
+
+.comments {
+    display: none;
+    margin-top: 20px;
+}
+
+.comments ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+.comments li {
+    margin-bottom: 10px;
+}
