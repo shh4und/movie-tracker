@@ -57,7 +57,7 @@ func GetEnvs() ConfigEnv {
 		DBUrl:                getEnv("DB_URL", "url"),
 		DBName:               getEnv("DB_NAME", "ecom"),
 		JwtToken:             getEnv("JWT_TK", "not-so-secret-now-is-it?"),
-		JwtExpirationSeconds: getEnvAsInt("JWT_EXP", 60),
+		JwtExpirationSeconds: getEnvAsInt("JWT_EXP", 3600),
 		ApiKey:               getEnv("API_KEY", ""),
 	}
 }
