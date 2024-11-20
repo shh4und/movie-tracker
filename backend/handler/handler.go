@@ -7,12 +7,9 @@ import (
 var (
 	logger *config.Logger
 	dbpg   *config.Postsql
-	apiKEY string
 )
 
 func InitHandler() {
 	logger = config.GetLogger("handler")
 	dbpg = config.GetPSQL()
-	apiKEY = config.Envs.ApiKey
-
 }
