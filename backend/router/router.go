@@ -8,7 +8,8 @@ func Init() {
 
 	// Initialize router (gin.Engine) with the default configs
 	router := gin.Default()
-
+	// Configure trusted proxies
+	router.SetTrustedProxies([]string{"127.0.0.1"}) // Confia apenas em localhost
 	// Serve static files from the frontend/static directory
 	router.Static("/static", "../frontend/static")
 
