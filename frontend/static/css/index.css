@@ -1,65 +1,94 @@
-body {
-    font-family: Arial, sans-serif;
-}
+/* /static/css/index.css */
+@import url('/static/css/common.css');
 
 header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 10px;
-    background-color: #333;
-    color: white;
+    background-color: var(--secondary);
+    padding: 1rem 2rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
-header button {
-    margin-left: 10px;
-}
-
-header button#logOutButton {
-    display: none;
+header h1 {
+    color: var(--primary);
+    font-weight: 600;
 }
 
 .container {
-    padding: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
 }
 
 .search-bar {
-    margin-bottom: 20px;
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.search-bar input {
+    flex: 1;
 }
 
 .movie-info {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+    background-color: var(--secondary);
+    padding: 2rem;
+    border-radius: 10px;
+    margin-bottom: 2rem;
 }
 
 .movie-info img {
-    max-width: 300px;
-    margin-bottom: 20px;
-}
-
-.movie-info div {
-    margin-bottom: 10px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
 .buttons {
-    margin-top: 20px;
-}
-
-.buttons button {
-    margin-right: 10px;
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
 }
 
 .comments {
-    display: none;
-    margin-top: 20px;
+    background-color: var(--secondary);
+    padding: 1.5rem;
+    border-radius: 10px;
+    margin-top: 2rem;
+    display: none; 
+}
+
+.comments h3 {
+    color: var(--primary);
+    margin-bottom: 1rem;
 }
 
 .comments ul {
-    list-style-type: none;
-    padding: 0;
+    margin-bottom: 1rem;
 }
 
 .comments li {
-    margin-bottom: 10px;
+    background-color: var(--dark);
+    padding: 1rem;
+    border-radius: 4px;
+    margin-bottom: 0.5rem;
+    
+}
+
+@media (max-width: 768px) {
+    header {
+        padding: 1rem;
+    }
+    
+    .container {
+        padding: 1rem;
+    }
+    
+    .movie-info {
+        padding: 1rem;
+    }
+    
+    .search-bar {
+        flex-direction: column;
+    }
+    
+    .buttons button {
+        width: 100%;
+    }
 }

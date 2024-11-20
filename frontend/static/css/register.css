@@ -1,37 +1,36 @@
-body {
-    font-family: Arial, sans-serif;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    background-color: #f0f0f0;
-}
+@import url('/static/css/common.css');
 
 .container {
-    background-color: white;
-    padding: 20px;
-    border-radius: 5px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    background-color: var(--secondary);
+    padding: 2rem;
+    border-radius: 10px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+    width: 100%;
+    max-width: 400px;
+    margin: 20px;
 }
 
 .container h2 {
-    margin-bottom: 20px;
+    color: var(--light);
+    margin-bottom: 1.5rem;
+    text-align: center;
 }
 
 .container input {
-    display: block;
-    padding: 10px;
-    margin-bottom: 10px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
+    width: 100%;
+    margin-bottom: 1rem;
 }
 
 .container button {
     width: 100%;
-    padding: 10px;
-    background-color: #333;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
+    padding: 12px;
+    font-size: 1rem;
+    font-weight: 500;
+}
+
+@media (max-width: 480px) {
+    .container {
+        margin: 10px;
+        padding: 1.5rem;
+    }
 }

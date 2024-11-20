@@ -8,16 +8,25 @@ function login() {
 
 function searchTitle() {
     const title = document.getElementById('searchInput').value;
+    // Hide comments section when starting new search
+    document.getElementById('commentsSection').style.display = 'none';
+
     fetch(`/api/v1/titles/search?title=${title}`)
         .then(response => response.json())
         .then(resp => {
             if (resp.success) {
                 displayMovieInfo(resp.data);
+                // Show comments section only on successful search
+                document.getElementById('commentsSection').style.display = 'block';
             } else {
                 alert("Title not found");
             }
         })
-        .catch(error => console.error('Error:', error));
+        .catch(error => {
+            console.error('Error:', error);
+            document.getElementById('commentsSection').style.display = 'none';
+
+        });
 }
 
 function displayMovieInfo(data) {
@@ -34,7 +43,7 @@ function displayMovieInfo(data) {
 
     const actionButtons = document.getElementById('actionButtons');
     actionButtons.innerHTML = `
-        <button onclick="addRating('${data.imdbID}')">Rating</button>
+        <button onclick="addRating('${data.imdbID}', event)">Rating</button>
         <button onclick="addFavorite('${data.imdbID}')">Favorites</button>
         <button>Watch Later</button>
         <button>Watched</button>
@@ -45,30 +54,50 @@ function displayMovieInfo(data) {
 
     document.getElementById('commentsList').innerHTML = '';
     document.getElementById('commentInput').value = '';
+
+    // Adicionar classes para animação
+    movieInfo.classList.add('fade-in');
+    actionButtons.classList.add('fade-in');
 }
 
-function addRating(imdbID) {
+function addRating(imdbID, event) {
+    // Get button from passed event
+    const button = event.target;
+    button.classList.add('loading');
+
+    // Validate rating input
     const rating = prompt("Enter your rating (1-10):");
-    if (rating) {
-        fetch('/api/v1/rate', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': 'Bearer ' + sessionStorage.getItem('token')
-            },
-            body: JSON.stringify({ title_imdbID: imdbID, rating: parseInt(rating) })
-        })
+    const ratingNum = parseInt(rating);
+
+    if (!rating || isNaN(ratingNum) || ratingNum < 1 || ratingNum > 10) {
+        alert("Please enter a valid rating between 1 and 10");
+        button.classList.remove('loading');
+        return;
+    }
+
+    fetch('/api/v1/rate', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + sessionStorage.getItem('token')
+        },
+        body: JSON.stringify({ title_imdbID: imdbID, rating: ratingNum })
+    })
         .then(response => response.json())
         .then(resp => {
             if (resp.success) {
                 alert('Rating added successfully');
-                console.log(resp.data)
             } else {
                 alert('Failed to add rating: ' + resp.message);
             }
         })
-        .catch(error => console.error('Error:', error));
-    }
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Failed to add rating');
+        })
+        .finally(() => {
+            button.classList.remove('loading');
+        });
 }
 
 function addFavorite(titleIMDbID) {
@@ -80,18 +109,18 @@ function addFavorite(titleIMDbID) {
                 'Content-Type': 'application/json',
                 'Authorization': 'Bearer ' + sessionStorage.getItem('token')
             },
-            body: JSON.stringify({ title_imdbID: titleIMDbID})
+            body: JSON.stringify({ title_imdbID: titleIMDbID })
         })
-        .then(response => response.json())
-        .then(resp => {
-            if (resp.success) {
-                alert('Favorite added successfully');
-                console.log(resp.data)
-            } else {
-                alert('Failed to add rating: ' + resp.message);
-            }
-        })
-        .catch(error => console.error('Error:', error));
+            .then(response => response.json())
+            .then(resp => {
+                if (resp.success) {
+                    alert('Favorite added successfully');
+                    console.log(resp.data)
+                } else {
+                    alert('Failed to add rating: ' + resp.message);
+                }
+            })
+            .catch(error => console.error('Error:', error));
     }
 }
 
@@ -106,11 +135,11 @@ function addComment() {
     }
 }
 
-function checkLogged(){
+function checkLogged() {
     checkTokenExpiration();
     const logged = localStorage.getItem('logged');
     const username = localStorage.getItem('username');
-    if (logged && username){
+    if (logged && username) {
         document.getElementById('usernameDisplay').textContent = `Logged in as: ${username}`;
         document.getElementById('registerButton').style.display = 'none';
         document.getElementById('loginButton').style.display = 'none';
@@ -122,10 +151,10 @@ function checkLogged(){
         document.getElementById('logOutButton').style.display = 'none';
     }
 }
-setInterval(checkTokenExpiration, 15000);
+setInterval(checkTokenExpiration, 60000);
 
 
-window.onload = function() {
+window.onload = function () {
     checkLogged();
     checkTokenExpiration();
 };
