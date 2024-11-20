@@ -10,6 +10,7 @@ import (
 	"github.com/shh4und/movie-tracker/services"
 )
 
+// need fixes
 // handler for fetching a list of a title search
 func GetTitle(ctx *gin.Context) {
 	titleName := ctx.Query("title")
