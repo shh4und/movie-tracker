@@ -20,7 +20,6 @@ func initRoutes(router *gin.Engine) {
 		public.POST("/register", handler.CreateUser) // create
 		public.POST("/login", handler.LoginUser)     // authenticate
 		// fetch a list of a title search
-		public.GET("/titles/search", handler.GetTitle)
 	}
 
 	// Protected routes
@@ -33,6 +32,8 @@ func initRoutes(router *gin.Engine) {
 		protected.DELETE("/users/delete", handler.DeleteUser)
 
 		// User actions
+		protected.GET("/titles/search", handler.GetTitlesSearch)
+
 		protected.POST("/rate", handler.AddRating)
 		protected.DELETE("/rate", handler.RemoveRating)
 
