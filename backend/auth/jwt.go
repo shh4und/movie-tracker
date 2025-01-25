@@ -8,6 +8,7 @@ import (
 	"github.com/shh4und/movie-tracker/config"
 )
 
+// CreateJWT generates a JWT token for a given user ID.
 func CreateJWT(secret []byte, userID uint) (string, error) {
 	expiration := time.Second * time.Duration(config.Envs.JwtExpirationSeconds)
 
