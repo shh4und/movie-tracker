@@ -6,6 +6,7 @@ import (
 	"os"
 )
 
+// Logger is a custom logger with different levels of logging.
 type Logger struct {
 	debug   *log.Logger
 	info    *log.Logger
@@ -14,6 +15,7 @@ type Logger struct {
 	writer  io.Writer
 }
 
+// NewLogger creates a new Logger instance with the specified prefix.
 func NewLogger(p string) *Logger {
 	writer := io.Writer(os.Stdout)
 	logger := log.New(writer, p, log.Ldate|log.Ltime)
@@ -27,36 +29,42 @@ func NewLogger(p string) *Logger {
 	}
 }
 
-// Non-Formatted Logs
+// Debug logs a debug message.
 func (l *Logger) Debug(v ...interface{}) {
 	l.debug.Println(v...)
 }
 
+// Info logs an info message.
 func (l *Logger) Info(v ...interface{}) {
 	l.info.Println(v...)
 }
 
+// Warn logs a warning message.
 func (l *Logger) Warn(v ...interface{}) {
 	l.warning.Println(v...)
 }
 
+// Error logs an error message.
 func (l *Logger) Error(v ...interface{}) {
 	l.err.Println(v...)
 }
 
-// Formated Logs
+// Debugf logs a formatted debug message.
 func (l *Logger) Debugf(format string, v ...interface{}) {
 	l.debug.Printf(format, v...)
 }
 
+// Infof logs a formatted info message.
 func (l *Logger) Infof(format string, v ...interface{}) {
 	l.info.Printf(format, v...)
 }
 
+// Warnf logs a formatted warning message.
 func (l *Logger) Warnf(format string, v ...interface{}) {
 	l.warning.Printf(format, v...)
 }
 
+// Errorf logs a formatted error message.
 func (l *Logger) Errorf(format string, v ...interface{}) {
 	l.err.Printf(format, v...)
 }

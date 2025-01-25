@@ -1,23 +1,13 @@
 package config
 
 import (
-	"fmt"
 	"os"
 	"strconv"
 
-	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/joho/godotenv"
 )
 
-var (
-	logger     *Logger
-	pgInstance *Postsql
-)
-
-type Postsql struct {
-	DB *pgxpool.Pool
-}
-
+// ConfigEnv holds the configuration values for the application.
 type ConfigEnv struct {
 	PublicHost           string
 	Port                 string
@@ -30,23 +20,11 @@ type ConfigEnv struct {
 	JwtExpirationSeconds int64
 }
 
+// Envs is a global variable that holds the loaded environment configuration.
 var Envs = GetEnvs()
 
-func Init() error {
-	var err error
-
-	pgInstance, err = InitPSQL()
-	if err != nil {
-		return fmt.Errorf("Error at initialize PostgreSQL: %v", err)
-	}
-
-	return nil
-}
-
-func GetPSQL() *Postsql { return pgInstance }
-
+// GetEnvs loads environment variables and returns a ConfigEnv struct.
 func GetEnvs() ConfigEnv {
-	// get the env file
 	godotenv.Load()
 
 	return ConfigEnv{
@@ -62,29 +40,25 @@ func GetEnvs() ConfigEnv {
 	}
 }
 
-func GetLogger(p string) *Logger {
-	logger = NewLogger(p)
-	return logger
-}
-
-// Gets the env by key or fallbacks
+// getEnv retrieves the value of the environment variable named by the key.
+// It returns the value, or the fallback if the variable is not present.
 func getEnv(key, fallback string) string {
 	if value, ok := os.LookupEnv(key); ok {
 		return value
 	}
-
 	return fallback
 }
 
+// getEnvAsInt retrieves the value of the environment variable named by the key
+// and converts it to an int64. It returns the value, or the fallback if the
+// variable is not present or cannot be converted.
 func getEnvAsInt(key string, fallback int64) int64 {
 	if value, ok := os.LookupEnv(key); ok {
 		i, err := strconv.ParseInt(value, 10, 64)
 		if err != nil {
 			return fallback
 		}
-
 		return i
 	}
-
 	return fallback
 }
