@@ -1,26 +1,24 @@
 package router
 
 import (
-	"github.com/gin-gonic/gin"
+	"net/http"
 )
 
 func Init() {
+	mux := http.NewServeMux()
 
-	// Initialize router (gin.Engine) with the default configs
-	router := gin.Default()
-	// Configure trusted proxies
-	router.SetTrustedProxies([]string{"127.0.0.1"}) // Confia apenas em localhost
-	// Serve static files from the frontend/static directory
-	router.Static("/static", "../frontend/static")
+	// Serve static files
+	fileServer := http.FileServer(http.Dir("../frontend/static"))
+	mux.Handle("/static/", http.StripPrefix("/static", fileServer))
 
-	// Serve the main HTML files directly from frontend/static
-	router.StaticFile("/index", "../frontend/static/index.html")
-	router.StaticFile("/register", "../frontend/static/register.html")
-	router.StaticFile("/login", "../frontend/static/login.html")
+	// Serve main HTML files
+	mux.Handle("/index", http.FileServer(http.Dir("../frontend/static/index.html")))
+	mux.Handle("/register", http.FileServer(http.Dir("../frontend/static/register.html")))
+	mux.Handle("/login", http.FileServer(http.Dir("../frontend/static/login.html")))
 
 	// Initialize routes
-	initRoutes(router)
+	initRoutes(mux)
 
 	// Run server
-	router.Run(":8080") // listen and serve on 0.0.0.0:8080 (for windows "localhost:8080")
+	http.ListenAndServe(":8080", mux)
 }
