@@ -8,7 +8,7 @@ func errParamIsRequired(name, tp string) error {
 	return fmt.Errorf("( param: %s | type: %s ) is required", name, tp)
 }
 
-// Create User
+// CreateUserRequest represents the request body for creating a user
 type CreateUserRequest struct {
 	Username string `json:"username"`
 	Email    string `json:"email"`
@@ -16,6 +16,7 @@ type CreateUserRequest struct {
 	Minor    bool   `json:"minor"`
 }
 
+// Validate validates the CreateUserRequest
 func (r *CreateUserRequest) Validate() error {
 	if r.Username == "" && r.Email == "" && r.Password == "" {
 		return fmt.Errorf("request body is empty or malformed")
@@ -44,7 +45,7 @@ func (r *CreateUserRequest) Validate() error {
 	return nil
 }
 
-// Update User Data
+// UpdateUserRequest represents the request body for updating user data
 type UpdateUserRequest struct {
 	Username  string `json:"username"`
 	Email     string `json:"email"`
@@ -55,6 +56,7 @@ type UpdateUserRequest struct {
 	Status    string `json:"status"`
 }
 
+// Validate validates the UpdateUserRequest
 func (r *UpdateUserRequest) Validate() error {
 	if r.Username == "" || r.Email == "" || r.Password == "" || r.FirstName == "" || r.LastName == "" || r.PhotoURL == "" || r.Status == "" {
 		return nil
@@ -63,54 +65,20 @@ func (r *UpdateUserRequest) Validate() error {
 	return fmt.Errorf("at least one valid field must be provided")
 }
 
-type TitleRequest struct {
-	ID         uint   `json:"id"`
-	Title      string `json:"Title"`
-	Year       string `json:"Year"`
-	Rated      string `json:"Rated"`
-	Released   string `json:"Released"`
-	Runtime    string `json:"Runtime"`
-	Genre      string `json:"Genre"`
-	Director   string `json:"Director"`
-	Writer     string `json:"Writer"`
-	Actors     string `json:"Actors"`
-	Plot       string `json:"Plot"`
-	Language   string `json:"Language"`
-	Country    string `json:"Country"`
-	Awards     string `json:"Awards"`
-	Poster     string `json:"Poster"`
-	IMDBRating string `json:"imdbRating"`
-	IMDBID     string `json:"imdbID"`
-	Type       string `json:"Type"`
-	Production string `json:"Production"`
-	Response   string `json:"Response"`
-}
-
-type SearchRequest struct {
-	Titles       []TitleRequest `json:"Search"`
-	TotalResults string         `json:"totalResults"`
-	Response     string         `json:"Response"`
-}
-
-func (r *SearchRequest) Validate() error {
-	if r.Response == "False" {
-		return fmt.Errorf("movie not found")
-	}
-	return nil
-}
-
+// LoginUserRequest represents the request body for user login
 type LoginUserRequest struct {
 	Username string `json:"username"`
 	Password string `json:"password"`
 }
 
+// Validate validates the LoginUserRequest
 func (r *LoginUserRequest) Validate() error {
 	if r.Username == "" && r.Password == "" {
 		return fmt.Errorf("request body is empty or malformed")
 	}
 
 	if r.Username == "" {
-		return errParamIsRequired("email", "string")
+		return errParamIsRequired("username", "string")
 	}
 
 	if r.Password == "" {
