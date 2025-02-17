@@ -10,6 +10,6 @@ var (
 )
 
 func InitHandler() {
-	logger = config.GetLogger("handler")
+	logger = config.NewLogger("handler")
 	dbpg = config.GetPSQL()
 }
