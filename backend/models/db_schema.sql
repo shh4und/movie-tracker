@@ -79,5 +79,8 @@ CREATE TABLE IF NOT EXISTS tracker.watched_movies (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+
+ALTER TABLE tracker.titles 
+ALTER COLUMN year TYPE VARCHAR(10);
 END;
 
