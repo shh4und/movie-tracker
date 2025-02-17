@@ -8,7 +8,7 @@ var (
 )
 
 func InitServices() {
-	logger = config.GetLogger("services")
+	logger = config.NewLogger("services")
 	apiKEY = config.Envs.ApiKey
 
 }
