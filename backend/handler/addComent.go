@@ -1,5 +1,5 @@
 package handler
 
-import "github.com/gin-gonic/gin"
+import "net/http"
 
-func AddComment(ctx *gin.Context) {}
+func AddComment(w http.ResponseWriter, r *http.Request) {}

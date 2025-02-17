@@ -4,29 +4,28 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/gin-gonic/gin"
 	"github.com/shh4und/movie-tracker/models"
 )
 
-func GetUserProfileByUsername(ctx *gin.Context) {
+func GetUserProfileByUsername(w http.ResponseWriter, r *http.Request) {
 
-	username := ctx.Query("username")
+	username := r.URL.Query().Get("username")
 
 	if username == "" {
-		sendError(ctx, http.StatusBadRequest, errParamIsRequired("username", "query-param").Error())
+		sendError(w, http.StatusBadRequest, errParamIsRequired("username", "query-param").Error())
 		return
 	}
 
-	query := "SELECT username FROM users WHERE username=$1"
+	query := "SELECT username FROM tracker.users WHERE username=$1"
 
 	var user models.User
 
-	err := dbpg.DB.QueryRow(ctx, query, username).Scan(&user.Username)
+	err := dbpg.DB.QueryRow(r.Context(), query, username).Scan(&user.Username)
 	if err != nil {
-		sendError(ctx, http.StatusNotFound, fmt.Sprintf("user with username: %s not found on the database", username))
+		sendError(w, http.StatusNotFound, fmt.Sprintf("user with username: %s not found on the database", username))
 		return
 	}
 
-	sendSuccess(ctx, "get-user-username", user.Username)
+	sendSuccess(w, "get-user-username", user.Username)
 
 }

@@ -1,25 +1,26 @@
 package handler
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
-
-	"github.com/gin-gonic/gin"
 )
 
-func sendError(ctx *gin.Context, code int, msg string) {
-	ctx.Header("Content-type", "application/json")
-	ctx.JSON(code, gin.H{
+func sendError(w http.ResponseWriter, code int, msg string) {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(code)
+	json.NewEncoder(w).Encode(map[string]interface{}{
 		"success":   false,
 		"message":   msg,
 		"errorCode": code,
 	})
 }
 
-func sendSuccess(ctx *gin.Context, op string, data interface{}) {
-	ctx.Header("Content-type", "application/json")
-	ctx.JSON(http.StatusOK, gin.H{
-		"message": fmt.Sprintf("operation from handler %s: successfuly done", op),
+func sendSuccess(w http.ResponseWriter, op string, data interface{}) {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(map[string]interface{}{
+		"message": fmt.Sprintf("operation from handler %s: successfully done", op),
 		"success": true,
 		"data":    data,
 	})

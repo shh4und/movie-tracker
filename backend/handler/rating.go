@@ -1,42 +1,39 @@
 package handler
 
 import (
+	"encoding/json"
 	"net/http"
 	"strconv"
-
-	"github.com/gin-gonic/gin"
 )
 
 // AddRating adds a rating for a movie
-func AddRating(ctx *gin.Context) {
-	userID := ctx.MustGet("userID").(string)
+func AddRating(w http.ResponseWriter, r *http.Request) {
+	userID := r.Context().Value("userID").(string)
 	var ratingRequest struct {
 		TitleIMDbID string `json:"title_imdbID"`
 		Rating      int    `json:"rating"`
 	}
-	if err := ctx.ShouldBindJSON(&ratingRequest); err != nil {
+	if err := json.NewDecoder(r.Body).Decode(&ratingRequest); err != nil {
 		logger.Errorf("error binding rating request: %v", err)
-		sendError(ctx, http.StatusBadRequest, err.Error())
+		sendError(w, http.StatusBadRequest, err.Error())
 		return
 	}
 
-	tx, err := dbpg.DB.Begin(ctx)
+	tx, err := dbpg.DB.Begin(r.Context())
 	if err != nil {
 		logger.Errorf("error starting transaction: %v", err)
-		sendError(ctx, http.StatusInternalServerError, err.Error())
+		sendError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
-	defer tx.Rollback(ctx)
+	defer tx.Rollback(r.Context())
 
 	// Check if the title exists in the titles table
 	var titleID uint
-	err = tx.QueryRow(ctx, "SELECT id FROM titles WHERE imdb_id = $1", ratingRequest.TitleIMDbID).Scan(&titleID)
+	err = tx.QueryRow(r.Context(), "SELECT id FROM titles WHERE imdb_id = $1", ratingRequest.TitleIMDbID).Scan(&titleID)
 	if err != nil {
 		// Title does not exist, insert it
-		// Fetch title details from OMDB API
-		// Title does not exist, insert it
 		logger.Errorf("Failed to rate title: %v", err.Error())
-		sendError(ctx, http.StatusInternalServerError, err.Error())
+		sendError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
 
@@ -44,74 +41,71 @@ func AddRating(ctx *gin.Context) {
 	userIDInt, err := strconv.Atoi(userID)
 	if err != nil {
 		logger.Errorf("Failed to convert userID to int: %v", err.Error())
-		sendError(ctx, http.StatusInternalServerError, err.Error())
+		sendError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
 
-	_, err = tx.Exec(ctx, `
+	_, err = tx.Exec(r.Context(), `
         INSERT INTO user_ratings (user_id, title_id, rating)
         VALUES ($1, $2, $3)
     `, userIDInt, titleID, ratingRequest.Rating)
 	if err != nil {
 		logger.Errorf("Failed to insert rating: %v", err.Error())
-		sendError(ctx, http.StatusInternalServerError, err.Error())
+		sendError(w, http.StatusInternalServerError, err.Error())
 		return
-
 	}
 
-	if err := tx.Commit(ctx); err != nil {
+	if err := tx.Commit(r.Context()); err != nil {
 		logger.Errorf("error committing transaction: %v", err)
-		sendError(ctx, http.StatusInternalServerError, err.Error())
+		sendError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
 
-	sendSuccess(ctx, "rating-added", ratingRequest)
-
+	sendSuccess(w, "rating-added", ratingRequest)
 }
 
-func RemoveRating(ctx *gin.Context) {
-	userID := ctx.MustGet("userID").(string)
+func RemoveRating(w http.ResponseWriter, r *http.Request) {
+	userID := r.Context().Value("userID").(string)
 	var ratingRequest struct {
 		TitleIMDbID string `json:"title_imdbID"`
 		Rating      int    `json:"rating"`
 	}
-	if err := ctx.ShouldBindJSON(&ratingRequest); err != nil {
+	if err := json.NewDecoder(r.Body).Decode(&ratingRequest); err != nil {
 		logger.Errorf("error binding rating request: %v", err)
-		sendError(ctx, http.StatusBadRequest, err.Error())
+		sendError(w, http.StatusBadRequest, err.Error())
 		return
 	}
 
-	tx, err := dbpg.DB.Begin(ctx)
+	tx, err := dbpg.DB.Begin(r.Context())
 	if err != nil {
 		logger.Errorf("error starting transaction: %v", err)
-		sendError(ctx, http.StatusInternalServerError, err.Error())
+		sendError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
-	defer tx.Rollback(ctx)
+	defer tx.Rollback(r.Context())
 
 	// Check if the title exists in the titles table
 	var titleID uint
-	err = tx.QueryRow(ctx, "SELECT id FROM titles WHERE imdb_id = $1", ratingRequest.TitleIMDbID).Scan(&titleID)
+	err = tx.QueryRow(r.Context(), "SELECT id FROM titles WHERE imdb_id = $1", ratingRequest.TitleIMDbID).Scan(&titleID)
 	if err != nil {
 		// Title does not exist, insert it
 		logger.Errorf("Failed to find title: %v", err.Error())
-		sendError(ctx, http.StatusInternalServerError, err.Error())
+		sendError(w, http.StatusInternalServerError, err.Error())
 		return
-
 	}
-	// Remove the favorite from the user_favorites table
-	_, err = tx.Exec(ctx, "DELETE FROM user_ratings WHERE user_id = $1 AND title_id = $2", userID, titleID)
+	// Remove the rating from the user_ratings table
+	_, err = tx.Exec(r.Context(), "DELETE FROM user_ratings WHERE user_id = $1 AND title_id = $2", userID, titleID)
 	if err != nil {
 		logger.Errorf("Failed to remove rating: %v", err.Error())
-		sendError(ctx, http.StatusInternalServerError, err.Error())
+		sendError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
 
-	if err := tx.Commit(ctx); err != nil {
+	if err := tx.Commit(r.Context()); err != nil {
 		logger.Errorf("error committing transaction: %v", err)
-		sendError(ctx, http.StatusInternalServerError, err.Error())
+		sendError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
 
-	sendSuccess(ctx, "rating-removed", ratingRequest)
+	sendSuccess(w, "rating-removed", ratingRequest)
 }

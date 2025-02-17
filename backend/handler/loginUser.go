@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"encoding/json"
 	"net/http"
 
 	"github.com/shh4und/movie-tracker/auth"
@@ -10,18 +11,19 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func LoginUser(ctx *gin.Context) {
-	request := LoginUserRequest{}
+func LoginUser(w http.ResponseWriter, r *http.Request) {
+	var request LoginUserRequest
 
-	if err := ctx.BindJSON(&request); err != nil {
+	// Parse JSON request body
+	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
 		logger.Errorf("request binding error: %v", err)
-		sendError(ctx, http.StatusBadRequest, err.Error())
+		sendError(w, http.StatusBadRequest, err.Error())
 		return
 	}
 
 	if err := request.Validate(); err != nil {
 		logger.Errorf("request validation error: %v", err)
-		sendError(ctx, http.StatusBadRequest, err.Error())
+		sendError(w, http.StatusBadRequest, err.Error())
 		return
 	}
 
@@ -29,25 +31,25 @@ func LoginUser(ctx *gin.Context) {
 
 	query := "SELECT id, username, password FROM tracker.users WHERE username=$1"
 
-	err := dbpg.DB.QueryRow(ctx, query, request.Username).Scan(&user.ID, &user.Username, &user.Password)
+	err := dbpg.DB.QueryRow(r.Context(), query, request.Username).Scan(&user.ID, &user.Username, &user.Password)
 	if err != nil {
-		sendError(ctx, http.StatusBadRequest, "invalid username or password")
+		sendError(w, http.StatusBadRequest, "invalid username or password")
 		return
 	}
 
 	if !auth.ComparePasswords(user.Password, []byte(request.Password)) {
-		sendError(ctx, http.StatusBadRequest, "invalid username or password")
+		sendError(w, http.StatusBadRequest, "invalid username or password")
 		return
 	}
 
 	secret := []byte(config.Envs.JwtToken)
 	token, err := auth.CreateJWT(secret, user.ID)
 	if err != nil {
-		sendError(ctx, http.StatusInternalServerError, err.Error())
+		sendError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
 
-	sendSuccess(ctx, "login-user", gin.H{
+	sendSuccess(w, "login-user", gin.H{
 		"token":    token,
 		"userID":   user.ID,
 		"username": user.Username,

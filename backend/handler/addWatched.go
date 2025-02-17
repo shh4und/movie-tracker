@@ -1,5 +1,5 @@
 package handler
 
-import "github.com/gin-gonic/gin"
+import "net/http"
 
-func AddWatched(ctx *gin.Context) {}
+func AddWatched(w http.ResponseWriter, r *http.Request) {}

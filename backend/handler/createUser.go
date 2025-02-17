@@ -1,58 +1,61 @@
 package handler
 
 import (
+	"encoding/json"
 	"net/http"
 
-	"github.com/gin-gonic/gin"
 	"github.com/shh4und/movie-tracker/auth"
 )
 
-func CreateUser(ctx *gin.Context) {
-	request := CreateUserRequest{}
+func CreateUser(w http.ResponseWriter, r *http.Request) {
+	var request CreateUserRequest
 
-	if err := ctx.BindJSON(&request); err != nil {
+	// Parse JSON request body
+	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
 		logger.Errorf("error binding request: %v", err)
-		sendError(ctx, http.StatusBadRequest, err.Error())
+		sendError(w, http.StatusBadRequest, err.Error())
 		return
 	}
 
+	// Validate request
 	if err := request.Validate(); err != nil {
 		logger.Errorf("request validation error: %v", err)
-		sendError(ctx, http.StatusBadRequest, err.Error())
+		sendError(w, http.StatusBadRequest, err.Error())
 		return
 	}
 
+	// Hash password
 	hashedPassword, err := auth.HashPassword(request.Password)
 	if err != nil {
 		logger.Errorf("error hashing password: %v", err.Error())
-		sendError(ctx, http.StatusInternalServerError, err.Error())
+		sendError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
 
-	tx, err := dbpg.DB.Begin(ctx)
-
+	// Begin transaction
+	tx, err := dbpg.DB.Begin(r.Context())
 	if err != nil {
 		logger.Errorf("error starting transaction: %v", err)
-		sendError(ctx, http.StatusInternalServerError, err.Error())
+		sendError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
-	defer tx.Rollback(ctx)
+	defer tx.Rollback(r.Context())
 
+	// Insert user into database
 	query := "INSERT INTO tracker.users (username, email, password) VALUES ($1, $2, $3)"
-
-	_, err = tx.Exec(ctx, query, request.Username, request.Email, hashedPassword)
+	_, err = tx.Exec(r.Context(), query, request.Username, request.Email, hashedPassword)
 	if err != nil {
 		logger.Errorf("error creating user: %v", err.Error())
-		sendError(ctx, http.StatusInternalServerError, err.Error())
+		sendError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
 
-	if err := tx.Commit(ctx); err != nil {
+	// Commit transaction
+	if err := tx.Commit(r.Context()); err != nil {
 		logger.Errorf("error committing transaction: %v", err)
-		sendError(ctx, http.StatusInternalServerError, err.Error())
+		sendError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
 
-	sendSuccess(ctx, "create-user", request.Username)
-
+	sendSuccess(w, "create-user", request.Username)
 }

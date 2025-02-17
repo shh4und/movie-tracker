@@ -1,32 +1,32 @@
 package handler
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"strconv"
 	"strings"
 
-	"github.com/gin-gonic/gin"
 	"github.com/shh4und/movie-tracker/auth"
 )
 
-func UpdateUser(ctx *gin.Context) {
-	id := ctx.Query("id")
+func UpdateUser(w http.ResponseWriter, r *http.Request) {
+	id := r.URL.Query().Get("id")
 	if id == "" {
-		sendError(ctx, http.StatusBadRequest, errParamIsRequired("id", "query-param").Error())
+		sendError(w, http.StatusBadRequest, errParamIsRequired("id", "query-param").Error())
 		return
 	}
 
-	request := UpdateUserRequest{}
-	if err := ctx.BindJSON(&request); err != nil {
+	var request UpdateUserRequest
+	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
 		logger.Errorf("request binding error: %v", err)
-		sendError(ctx, http.StatusBadRequest, err.Error())
+		sendError(w, http.StatusBadRequest, err.Error())
 		return
 	}
 
 	if err := request.Validate(); err != nil {
 		logger.Errorf("request validation error: %v", err)
-		sendError(ctx, http.StatusBadRequest, err.Error())
+		sendError(w, http.StatusBadRequest, err.Error())
 		return
 	}
 	var updateFields []string
@@ -34,7 +34,7 @@ func UpdateUser(ctx *gin.Context) {
 	hashedPassword, err := auth.HashPassword(request.Password)
 	if err != nil {
 		logger.Errorf("error hashing password: %v", err.Error())
-		sendError(ctx, http.StatusInternalServerError, err.Error())
+		sendError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
 
@@ -73,32 +73,32 @@ func UpdateUser(ctx *gin.Context) {
 		updateValues = append(updateValues, request.Status)
 
 	}
-	tx, err := dbpg.DB.Begin(ctx)
+	tx, err := dbpg.DB.Begin(r.Context())
 
 	if err != nil {
 		logger.Errorf("error starting transaction: %v", err)
-		sendError(ctx, http.StatusInternalServerError, err.Error())
+		sendError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
-	defer tx.Rollback(ctx)
+	defer tx.Rollback(r.Context())
 
-	query := fmt.Sprintf("UPDATE users SET %s WHERE id=$%d RETURNING *", strings.Join(updateFields, ", "), len(updateValues)+1)
+	query := fmt.Sprintf("UPDATE tracker.users SET %s WHERE id=$%d RETURNING *", strings.Join(updateFields, ", "), len(updateValues)+1)
 
 	updateValues = append(updateValues, id)
 
-	_, err = tx.Query(ctx, query, updateValues...)
+	_, err = tx.Query(r.Context(), query, updateValues...)
 	if err != nil {
 		logger.Errorf("error updating user: %v", err.Error())
-		sendError(ctx, http.StatusInternalServerError, err.Error())
+		sendError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
 
-	if err := tx.Commit(ctx); err != nil {
+	if err := tx.Commit(r.Context()); err != nil {
 		logger.Errorf("error committing transaction: %v", err)
-		sendError(ctx, http.StatusInternalServerError, err.Error())
+		sendError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
 
-	sendSuccess(ctx, "update-user", request.Username)
+	sendSuccess(w, "update-user", request.Username)
 
 }

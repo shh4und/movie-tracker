@@ -3,41 +3,39 @@ package handler
 import (
 	"fmt"
 	"net/http"
-
-	"github.com/gin-gonic/gin"
 )
 
-func DeleteUser(ctx *gin.Context) {
-	id := ctx.Query("id")
+func DeleteUser(w http.ResponseWriter, r *http.Request) {
+	id := r.URL.Query().Get("id")
 
 	if id == "" {
-		sendError(ctx, http.StatusBadRequest, errParamIsRequired("id", "query-param").Error())
+		sendError(w, http.StatusBadRequest, errParamIsRequired("id", "query-param").Error())
 		return
 	}
 
-	tx, err := dbpg.DB.Begin(ctx)
+	tx, err := dbpg.DB.Begin(r.Context())
 
 	if err != nil {
 		logger.Errorf("error starting transaction: %v", err)
-		sendError(ctx, http.StatusInternalServerError, err.Error())
+		sendError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
-	defer tx.Rollback(ctx)
+	defer tx.Rollback(r.Context())
 
-	query := "DELETE FROM users WHERE id=$1"
+	query := "DELETE FROM tracker.users WHERE id=$1"
 
-	_, err = tx.Exec(ctx, query, id)
+	_, err = tx.Exec(r.Context(), query, id)
 	if err != nil {
-		sendError(ctx, http.StatusInternalServerError, fmt.Sprintf("error deleting user with id:%s", id))
+		sendError(w, http.StatusInternalServerError, fmt.Sprintf("error deleting user with id:%s", id))
 		return
 	}
 
-	if err := tx.Commit(ctx); err != nil {
+	if err := tx.Commit(r.Context()); err != nil {
 		logger.Errorf("error committing transaction: %v", err)
-		sendError(ctx, http.StatusInternalServerError, err.Error())
+		sendError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
 
-	sendSuccess(ctx, "delete-user", id)
+	sendSuccess(w, "delete-user", id)
 
 }

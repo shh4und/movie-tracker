@@ -4,31 +4,30 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/gin-gonic/gin"
 	"github.com/jackc/pgx/v5"
 	"github.com/shh4und/movie-tracker/models"
 	"github.com/shh4und/movie-tracker/services"
 )
 
 // handler for fetching a list of a title search
-func GetTitlesSearch(ctx *gin.Context) {
-	titleName := ctx.Query("title")
+func GetTitlesSearch(w http.ResponseWriter, r *http.Request) {
+	titleName := r.URL.Query().Get("title")
 	normalizedTitleName := strings.ToLower(titleName)
 
-	tx, err := dbpg.DB.Begin(ctx)
+	tx, err := dbpg.DB.Begin(r.Context())
 	if err != nil {
 		logger.Errorf("error starting transaction: %v", err)
-		sendError(ctx, http.StatusInternalServerError, err.Error())
+		sendError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
-	defer tx.Rollback(ctx)
+	defer tx.Rollback(r.Context())
 
 	// First try to find exact matches in database
 	var titles []*models.Title
-	rows, err := tx.Query(ctx, "SELECT * FROM tracker.titles WHERE LOWER(title) = $1", normalizedTitleName)
+	rows, err := tx.Query(r.Context(), "SELECT * FROM tracker.titles WHERE LOWER(title) = $1", normalizedTitleName)
 	if err != nil {
 		logger.Errorf("error querying titles: %v", err)
-		sendError(ctx, http.StatusInternalServerError, err.Error())
+		sendError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
 	defer rows.Close()
@@ -37,7 +36,7 @@ func GetTitlesSearch(ctx *gin.Context) {
 	titles, err = pgx.CollectRows(rows, pgx.RowToAddrOfStructByPos[models.Title])
 	if err != nil && err != pgx.ErrNoRows {
 		logger.Errorf("error collecting rows: %v", err)
-		sendError(ctx, http.StatusInternalServerError, err.Error())
+		sendError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
 
@@ -47,15 +46,18 @@ func GetTitlesSearch(ctx *gin.Context) {
 		search, err := services.FetchSearchFromOMDB(normalizedTitleName)
 		if err != nil {
 			logger.Errorf("error searching OMDB: %v", err)
-			sendError(ctx, http.StatusInternalServerError, err.Error())
+			sendError(w, http.StatusInternalServerError, err.Error())
 			return
 		}
-
+		// Add limit to prevent overwhelming response
+		if len(search.Titles) > 10 {
+			search.Titles = search.Titles[:10]
+		}
 		// Store each found title in database
 		for _, omdbTitle := range search.Titles {
 			// Check if title already exists by IMDB ID
 			var exists bool
-			err = tx.QueryRow(ctx, "SELECT EXISTS(SELECT 1 FROM tracker.titles WHERE imdb_id = $1)", omdbTitle.IMDBID).Scan(&exists)
+			err = tx.QueryRow(r.Context(), "SELECT EXISTS(SELECT 1 FROM tracker.titles WHERE imdb_id = $1)", omdbTitle.IMDBID).Scan(&exists)
 			if err != nil {
 				logger.Errorf("error checking title existence: %v", err)
 				continue
@@ -70,7 +72,7 @@ func GetTitlesSearch(ctx *gin.Context) {
 				}
 
 				// Insert new title
-				err = tx.QueryRow(ctx, `
+				err = tx.QueryRow(r.Context(), `
                     INSERT INTO tracker.titles (
                         title, year, rated, released, runtime, genre, director, 
                         writer, actors, plot, language, country, awards, 
@@ -97,12 +99,16 @@ func GetTitlesSearch(ctx *gin.Context) {
 			}
 		}
 	}
+	// Add limit to prevent overwhelming response
+	if len(titles) > 10 {
+		titles = titles[:10]
+	}
 
-	if err = tx.Commit(ctx); err != nil {
+	if err = tx.Commit(r.Context()); err != nil {
 		logger.Errorf("error committing transaction: %v", err)
-		sendError(ctx, http.StatusInternalServerError, err.Error())
+		sendError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
 
-	sendSuccess(ctx, "get-title", titles)
+	sendSuccess(w, "get-title", titles)
 }
